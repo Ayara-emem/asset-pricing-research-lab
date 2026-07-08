@@ -15,7 +15,10 @@ from .returns import (
     annualized_volatility,
 )
 
-from .statistics import mean_return
+from .statistics import (
+    mean_return,
+    variance,
+)
 
 __all__ = [
     "arithmetic_returns",
@@ -24,4 +27,5 @@ __all__ = [
     "annualized_return",
     "annualized_volatility",
     "mean_return",
+    "variance",
 ]

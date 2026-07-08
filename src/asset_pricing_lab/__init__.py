@@ -6,3 +6,22 @@ factor modeling, and quantitative investment research.
 """
 
 from .version import __version__
+
+from .returns import (
+    arithmetic_returns,
+    log_returns,
+    cumulative_returns,
+    annualized_return,
+    annualized_volatility,
+)
+
+from .statistics import mean_return
+
+__all__ = [
+    "arithmetic_returns",
+    "log_returns",
+    "cumulative_returns",
+    "annualized_return",
+    "annualized_volatility",
+    "mean_return",
+]

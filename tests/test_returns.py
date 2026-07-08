@@ -9,6 +9,8 @@ from asset_pricing_lab.returns import (
     arithmetic_returns,
     log_returns,
     cumulative_returns,
+    annualized_return,
+    annualized_volatility,
 )
 
 
@@ -38,5 +40,24 @@ def test_cumulative_returns():
     expected = (1.10 * 1.05 * 0.97) - 1
 
     result = cumulative_returns(returns)
+
+    assert np.isclose(result, expected)
+
+def test_annualized_return():
+    cumulative = 0.10
+    periods = 252
+
+    expected = 0.10
+
+    result = annualized_return(cumulative, periods)
+
+    assert np.isclose(result, expected)
+
+def test_annualized_volatility():
+    returns = np.array([0.01, 0.02, -0.01, 0.03])
+
+    expected = np.std(returns, ddof=1) * np.sqrt(252)
+
+    result = annualized_volatility(returns)
 
     assert np.isclose(result, expected)

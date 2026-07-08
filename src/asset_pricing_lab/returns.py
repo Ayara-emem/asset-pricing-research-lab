@@ -67,3 +67,30 @@ def log_returns(prices: np.ndarray) -> np.ndarray:
         raise ValueError("All prices must be positive.")
 
     return np.log(prices[1:] / prices[:-1])
+
+def cumulative_returns(returns: np.ndarray) -> float:
+    """
+    Compute the cumulative return from a series of arithmetic returns.
+
+    Parameters
+    ----------
+    returns : np.ndarray
+        One-dimensional array of arithmetic returns.
+
+    Returns
+    -------
+    float
+        Cumulative return over the period.
+
+    Raises
+    ------
+    ValueError
+        If the input is not one-dimensional.
+    """
+
+    returns = np.asarray(returns, dtype=float)
+
+    if returns.ndim != 1:
+        raise ValueError("returns must be one-dimensional")
+
+    return np.prod(1 + returns) - 1

@@ -5,7 +5,11 @@ from pathlib import Path
 # Make the src directory importable
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
-from asset_pricing_lab.returns import arithmetic_returns, log_returns
+from asset_pricing_lab.returns import (
+    arithmetic_returns,
+    log_returns,
+    cumulative_returns,
+)
 
 
 def test_arithmetic_returns():
@@ -26,3 +30,13 @@ def test_log_returns():
     result = log_returns(prices)
 
     assert np.allclose(result, expected)
+
+
+def test_cumulative_returns():
+    returns = np.array([0.10, 0.05, -0.03])
+
+    expected = (1.10 * 1.05 * 0.97) - 1
+
+    result = cumulative_returns(returns)
+
+    assert np.isclose(result, expected)

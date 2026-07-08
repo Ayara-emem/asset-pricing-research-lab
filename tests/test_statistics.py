@@ -12,6 +12,8 @@ from asset_pricing_lab.statistics import (
     covariance,
     correlation,
     skewness,
+    covariance_matrix,
+    correlation_matrix
 )
 
 def test_mean_return():
@@ -158,3 +160,151 @@ def test_kurtosis():
 def test_kurtosis_insufficient_data():
     with pytest.raises(ValueError):
         kurtosis([1, 2, 3])
+
+def test_covariance_matrix():
+    returns = np.array([
+        [1, 2],
+        [2, 3],
+        [3, 4],
+        [4, 5],
+    ], dtype=float)
+
+    expected = np.cov(
+        returns,
+        rowvar=False,
+        ddof=1,
+    )
+
+    assert np.allclose(
+        covariance_matrix(returns),
+        expected,
+    )
+
+def test_covariance_matrix():
+    returns = np.array([
+        [1, 2],
+        [2, 3],
+        [3, 4],
+        [4, 5],
+    ], dtype=float)
+
+    expected = np.cov(
+        returns,
+        rowvar=False,
+        ddof=1,
+    )
+
+    assert np.allclose(
+        covariance_matrix(returns),
+        expected,
+    )
+
+def test_covariance_matrix_is_symmetric():
+    returns = np.array([
+        [1, 2],
+        [2, 3],
+        [3, 4],
+        [4, 5],
+    ], dtype=float)
+
+    cov = covariance_matrix(returns)
+
+    assert np.allclose(cov, cov.T)
+
+def test_covariance_matrix_diagonal():
+    returns = np.array([
+        [1, 2],
+        [2, 3],
+        [3, 4],
+        [4, 5],
+    ], dtype=float)
+
+    cov = covariance_matrix(returns)
+
+    assert np.isclose(
+        cov[0, 0],
+        variance(returns[:, 0]),
+    )
+
+    assert np.isclose(
+        cov[1, 1],
+        variance(returns[:, 1]),
+    )
+
+def test_covariance_matrix_empty():
+    with pytest.raises(ValueError):
+        covariance_matrix([])
+
+def test_covariance_matrix_one_dimensional():
+    with pytest.raises(ValueError):
+        covariance_matrix([1, 2, 3])
+
+def test_covariance_matrix_insufficient_observations():
+    with pytest.raises(ValueError):
+        covariance_matrix([[1, 2]], ddof=1)
+
+def test_correlation_matrix():
+    returns = np.array([
+        [1, 2],
+        [2, 3],
+        [3, 4],
+        [4, 5],
+    ], dtype=float)
+
+    expected = np.corrcoef(
+        returns,
+        rowvar=False,
+    )
+
+    assert np.allclose(
+        correlation_matrix(returns),
+        expected,
+    )
+
+def test_correlation_matrix_is_symmetric():
+    returns = np.array([
+        [1, 2],
+        [2, 3],
+        [3, 4],
+        [4, 5],
+    ], dtype=float)
+
+    corr = correlation_matrix(returns)
+
+    assert np.allclose(corr, corr.T)
+
+def test_correlation_matrix_diagonal():
+    returns = np.array([
+        [1, 2],
+        [2, 3],
+        [3, 4],
+        [4, 5],
+    ], dtype=float)
+
+    corr = correlation_matrix(returns)
+
+    assert np.allclose(
+        np.diag(corr),
+        np.ones(corr.shape[0]),
+    )
+
+def test_correlation_matrix_range():
+    returns = np.array([
+        [1, 2],
+        [2, 3],
+        [3, 4],
+        [4, 5],
+    ], dtype=float)
+
+    corr = correlation_matrix(returns)
+
+    assert np.all(corr <= 1.0)
+    assert np.all(corr >= -1.0)
+
+def test_correlation_matrix_empty():
+    with pytest.raises(ValueError):
+        correlation_matrix([])
+
+def test_correlation_matrix_one_dimensional():
+    with pytest.raises(ValueError):
+        correlation_matrix([1, 2, 3])

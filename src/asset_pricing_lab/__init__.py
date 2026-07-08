@@ -22,6 +22,8 @@ from .statistics import (
     covariance,
     correlation,
     kurtosis,
+    covariance_matrix,
+    correlation_matrix,
     
 )
 from scipy.stats import skew
@@ -35,4 +37,5 @@ __all__ = [
     "mean_return",
     "variance",
     "kurtosis"
+    "correlation_matrix",
 ]

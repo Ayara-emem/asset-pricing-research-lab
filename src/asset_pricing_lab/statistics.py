@@ -213,3 +213,80 @@ def kurtosis(returns, bias=False, fisher=True):
             fisher=fisher,
         )
     )
+
+def covariance_matrix(returns, ddof=1):
+    """
+    Compute the covariance matrix for multiple return series.
+
+    Parameters
+    ----------
+    returns : array-like of shape (n_observations, n_assets)
+        Matrix of returns where each column represents an asset.
+
+    ddof : int, default=1
+        Delta degrees of freedom.
+
+    Returns
+    -------
+    numpy.ndarray
+        Covariance matrix.
+
+    Raises
+    ------
+    ValueError
+        If the input is empty, one-dimensional,
+        or has too few observations.
+    """
+    returns = np.asarray(returns, dtype=float)
+
+    if returns.size == 0:
+        raise ValueError("Input returns array cannot be empty.")
+
+    if returns.ndim != 2:
+        raise ValueError(
+            "Input must be a 2-dimensional array."
+        )
+
+    if returns.shape[0] <= ddof:
+        raise ValueError(
+            "Number of observations must be greater than ddof."
+        )
+
+    return np.cov(
+        returns,
+        rowvar=False,
+        ddof=ddof,
+    )
+def correlation_matrix(returns):
+    """
+    Compute the correlation matrix for multiple return series.
+
+    Parameters
+    ----------
+    returns : array-like of shape (n_observations, n_assets)
+        Matrix of returns where each column represents an asset.
+
+    Returns
+    -------
+    numpy.ndarray
+        Correlation matrix.
+
+    Raises
+    ------
+    ValueError
+        If the input is empty or not two-dimensional.
+    """
+    returns = np.asarray(returns, dtype=float)
+
+    if returns.size == 0:
+        raise ValueError("Input returns array cannot be empty.")
+
+    if returns.ndim != 2:
+        raise ValueError(
+            "Input must be a 2-dimensional array."
+        )
+
+    return np.corrcoef(
+        returns,
+        rowvar=False,
+    )

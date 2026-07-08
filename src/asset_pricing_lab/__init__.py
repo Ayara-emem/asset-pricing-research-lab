@@ -18,7 +18,13 @@ from .returns import (
 from .statistics import (
     mean_return,
     variance,
+    standard_deviation,
+    covariance,
+    correlation,
+    kurtosis,
+    
 )
+from scipy.stats import skew
 
 __all__ = [
     "arithmetic_returns",
@@ -28,4 +34,5 @@ __all__ = [
     "annualized_volatility",
     "mean_return",
     "variance",
+    "kurtosis"
 ]

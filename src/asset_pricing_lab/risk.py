@@ -294,6 +294,9 @@ def calmar_ratio(
     prices : array-like
         Asset or portfolio values.
 
+    periods : int
+        Number of periods.
+
     periods_per_year : int, default=252
         Number of observations per year.
 
@@ -323,3 +326,79 @@ def calmar_ratio(
         )
 
     return annual_return / mdd
+
+def historical_var(
+    returns,
+    confidence_level: float = 0.95,
+) -> float:
+    """
+    Compute Historical Value at Risk (VaR).
+
+    Parameters
+    ----------
+    returns : array-like
+        Periodic returns.
+
+    confidence_level : float, default=0.95
+        Confidence level.
+
+    Returns
+    -------
+    float
+        Historical Value at Risk reported as a positive loss.
+    """
+    returns = np.asarray(returns, dtype=float)
+
+    if returns.size == 0:
+        raise ValueError("returns must not be empty.")
+
+    if not 0 < confidence_level < 1:
+        raise ValueError(
+            "confidence_level must be between 0 and 1."
+        )
+
+    percentile = np.percentile(
+        returns,
+        (1 - confidence_level) * 100,
+    )
+
+    return -float(percentile)
+
+def expected_shortfall(
+    returns,
+    confidence_level: float = 0.95,
+) -> float:
+    """
+    Compute Historical Expected Shortfall (Conditional VaR).
+
+    Parameters
+    ----------
+    returns : array-like
+        Periodic returns.
+
+    confidence_level : float, default=0.95
+        Confidence level.
+
+    Returns
+    -------
+    float
+        Expected Shortfall reported as a positive loss.
+    """
+    returns = np.asarray(returns, dtype=float)
+
+    if returns.size == 0:
+        raise ValueError("returns must not be empty.")
+
+    if not 0 < confidence_level < 1:
+        raise ValueError(
+            "confidence_level must be between 0 and 1."
+        )
+
+    percentile = np.percentile(
+        returns,
+        (1 - confidence_level) * 100,
+    )
+
+    tail_losses = returns[returns <= percentile]
+
+    return -float(np.mean(tail_losses))

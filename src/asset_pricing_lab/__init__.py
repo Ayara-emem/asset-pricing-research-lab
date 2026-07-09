@@ -37,6 +37,8 @@ from .risk import (
     drawdown,
     maximum_drawdown,
     calmar_ratio,
+    historical_var,
+    expected_shortfall,
     )
  
 
@@ -60,4 +62,6 @@ __all__ = [
     "drawdown",
     "maximum_drawdown",
     "calmar_ratio",
+    "historical_var",
+    "expected_shortfall",
 ]

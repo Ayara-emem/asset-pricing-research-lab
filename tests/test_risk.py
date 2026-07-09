@@ -15,6 +15,8 @@ from asset_pricing_lab.risk import (
     drawdown,
     maximum_drawdown,
     calmar_ratio,
+    historical_var,
+    expected_shortfall
 
 )
 
@@ -330,3 +332,133 @@ def test_calmar_ratio_relationship():
     ),
     expected,
 )
+    
+
+def test_historical_var():
+    returns = np.array([
+        -0.03,
+        -0.02,
+        -0.01,
+        0.00,
+        0.01,
+        0.02,
+    ])
+
+    var = historical_var(
+        returns,
+        confidence_level=0.95,
+    )
+
+    assert var > 0
+
+import pytest
+
+def test_historical_var_invalid_confidence():
+    returns = np.array([0.01, -0.02])
+
+    with pytest.raises(ValueError):
+        historical_var(
+            returns,
+            confidence_level=1.2,
+        )
+
+def test_historical_var_empty():
+    with pytest.raises(ValueError):
+        historical_var([])
+
+
+def test_historical_var_monotonic():
+    returns = np.array([
+        -0.05,
+        -0.02,
+        -0.01,
+        0.00,
+        0.01,
+        0.02,
+    ])
+
+    var95 = historical_var(
+        returns,
+        0.95,
+    )
+
+    var99 = historical_var(
+        returns,
+        0.99,
+    )
+
+    assert var99 >= var95
+
+
+def test_expected_shortfall():
+    returns = np.array([
+        -0.08,
+        -0.06,
+        -0.05,
+        -0.02,
+        0.00,
+        0.01,
+        0.03,
+    ])
+
+    es = expected_shortfall(returns)
+
+    assert es > 0
+
+def test_expected_shortfall_invalid_confidence():
+    returns = np.array([0.01, -0.02])
+
+    with pytest.raises(ValueError):
+        expected_shortfall(
+            returns,
+            confidence_level=0,
+        )
+
+
+def test_expected_shortfall_empty():
+    with pytest.raises(ValueError):
+        expected_shortfall([])
+
+
+def test_expected_shortfall_greater_than_var():
+    returns = np.array([
+        -0.10,
+        -0.08,
+        -0.05,
+        -0.03,
+        -0.02,
+        0.00,
+        0.01,
+        0.03,
+    ])
+
+    var = historical_var(returns)
+
+    es = expected_shortfall(returns)
+
+    assert es >= var
+
+def test_expected_shortfall_monotonic():
+    returns = np.array([
+        -0.12,
+        -0.09,
+        -0.06,
+        -0.03,
+        -0.01,
+        0.00,
+        0.01,
+        0.02,
+    ])
+
+    es95 = expected_shortfall(
+        returns,
+        confidence_level=0.95,
+    )
+
+    es99 = expected_shortfall(
+        returns,
+        confidence_level=0.99,
+    )
+
+    assert es99 >= es95
+

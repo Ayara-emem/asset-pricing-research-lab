@@ -39,6 +39,7 @@ from .risk import (
     historical_var,
     expected_shortfall,
     tracking_error,
+    information_ratio,
 ) 
 
 __all__ = [
@@ -64,4 +65,5 @@ __all__ = [
     "historical_var",
     "expected_shortfall",
     "tracking_error",
+    "information_ratio",
 ]

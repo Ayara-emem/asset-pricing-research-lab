@@ -462,3 +462,76 @@ def tracking_error(
         active_returns,
         ddof=ddof,
     )
+
+from .statistics import mean_return
+
+
+def information_ratio(
+    portfolio_returns,
+    benchmark_returns,
+    ddof: int = 1,
+) -> float:
+    """
+    Compute the Information Ratio.
+
+    Parameters
+    ----------
+    portfolio_returns : array-like
+        Portfolio periodic returns.
+
+    benchmark_returns : array-like
+        Benchmark periodic returns.
+
+    ddof : int, default=1
+        Delta degrees of freedom used in Tracking Error.
+
+    Returns
+    -------
+    float
+        Information Ratio. Returns np.nan if
+        Tracking Error is zero.
+    """
+    portfolio_returns = np.asarray(
+        portfolio_returns,
+        dtype=float,
+    )
+
+    benchmark_returns = np.asarray(
+        benchmark_returns,
+        dtype=float,
+    )
+
+    if portfolio_returns.size == 0:
+        raise ValueError(
+            "portfolio_returns must not be empty."
+        )
+
+    if benchmark_returns.size == 0:
+        raise ValueError(
+            "benchmark_returns must not be empty."
+        )
+
+    if portfolio_returns.shape != benchmark_returns.shape:
+        raise ValueError(
+            "portfolio_returns and benchmark_returns must have the same shape."
+        )
+
+    active_returns = (
+        portfolio_returns
+        - benchmark_returns
+    )
+
+    active_mean = mean_return(
+        active_returns
+    )
+
+    te = tracking_error(
+        portfolio_returns,
+        benchmark_returns,
+        ddof=ddof,
+    )
+
+    if te == 0:
+        return np.nan
+
+    return active_mean / te

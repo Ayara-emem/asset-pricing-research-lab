@@ -18,6 +18,7 @@ from asset_pricing_lab.risk import (
     historical_var,
     expected_shortfall,
     tracking_error,
+    information_ratio,
 
 )
 
@@ -544,3 +545,77 @@ def test_tracking_error_ddof():
     )
 
     assert te_sample >= te_population
+
+def test_information_ratio():
+    portfolio = np.array([
+        0.03,
+        0.01,
+        -0.01,
+        0.02,
+    ])
+
+    benchmark = np.array([
+        0.02,
+        0.01,
+        -0.02,
+        0.01,
+    ])
+
+    ir = information_ratio(
+        portfolio,
+        benchmark,
+    )
+
+    assert np.isfinite(ir)
+
+def test_information_ratio_zero_tracking_error():
+    returns = np.array([
+        0.01,
+        0.02,
+        -0.01,
+        0.00,
+    ])
+
+    ir = information_ratio(
+        returns,
+        returns,
+    )
+
+    assert np.isnan(ir)
+
+def test_information_ratio_shape_mismatch():
+    portfolio = np.array([0.01, 0.02])
+
+    benchmark = np.array([0.01])
+
+    with pytest.raises(ValueError):
+        information_ratio(
+            portfolio,
+            benchmark,
+        )
+
+def test_information_ratio_empty():
+    with pytest.raises(ValueError):
+        information_ratio([], [])
+
+def test_information_ratio_positive_active_returns():
+    portfolio = np.array([
+        0.04,
+        0.03,
+        0.02,
+        0.05,
+    ])
+
+    benchmark = np.array([
+        0.03,
+        0.02,
+        0.01,
+        0.04,
+    ])
+
+    ir = information_ratio(
+        portfolio,
+        benchmark,
+    )
+
+    assert ir > 0

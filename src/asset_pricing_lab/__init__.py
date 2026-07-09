@@ -28,6 +28,8 @@ from .statistics import (
 )
 from scipy.stats import skew
 
+from .risk import historical_volatility
+
 __all__ = [
     "arithmetic_returns",
     "log_returns",
@@ -38,4 +40,5 @@ __all__ = [
     "variance",
     "kurtosis"
     "correlation_matrix",
+    "historical_volatility",
 ]

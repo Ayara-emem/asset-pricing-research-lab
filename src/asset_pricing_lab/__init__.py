@@ -42,6 +42,11 @@ from .risk import (
     information_ratio,
 ) 
 
+from .capm import (
+    beta,
+    alpha,
+)
+
 __all__ = [
     "arithmetic_returns",
     "log_returns",
@@ -66,4 +71,6 @@ __all__ = [
     "expected_shortfall",
     "tracking_error",
     "information_ratio",
+    "beta",
+    "alpha",
 ]

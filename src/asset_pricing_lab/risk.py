@@ -277,3 +277,49 @@ def maximum_drawdown(
         Maximum drawdown.
     """
     return float(np.min(drawdown(prices)))
+
+from .returns import annualized_return
+
+
+def calmar_ratio(
+    prices: ArrayLike,
+    periods: int,
+    periods_per_year: int = 252,
+) -> float:
+    """
+    Compute the Calmar Ratio.
+
+    Parameters
+    ----------
+    prices : array-like
+        Asset or portfolio values.
+
+    periods_per_year : int, default=252
+        Number of observations per year.
+
+    Returns
+    -------
+    float
+        Calmar Ratio.
+
+    Raises
+    ------
+    ValueError
+        If maximum drawdown is zero.
+    """
+    prices = np.asarray(prices, dtype=float)
+    cumulative_return = (prices[-1] / prices[0]) - 1
+    annual_return = annualized_return(
+        cumulative_return=cumulative_return,
+        periods=periods,
+        periods_per_year=periods_per_year,
+)
+
+    mdd = abs(maximum_drawdown(prices))
+
+    if np.isclose(mdd, 0.0):
+        raise ValueError(
+            "Calmar Ratio is undefined when maximum drawdown is zero."
+        )
+
+    return annual_return / mdd

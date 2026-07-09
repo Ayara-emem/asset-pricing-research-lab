@@ -36,6 +36,7 @@ from .risk import (
     sortino_ratio,
     drawdown,
     maximum_drawdown,
+    calmar_ratio,
     )
  
 
@@ -58,4 +59,5 @@ __all__ = [
     "sortino_ratio",
     "drawdown",
     "maximum_drawdown",
+    "calmar_ratio",
 ]

@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from asset_pricing_lab.returns import annualized_return
 from asset_pricing_lab.statistics import (
     standard_deviation,
     mean_return,
@@ -13,6 +14,8 @@ from asset_pricing_lab.risk import (
     sortino_ratio,
     drawdown,
     maximum_drawdown,
+    calmar_ratio,
+
 )
 
 def test_historical_volatility():
@@ -261,3 +264,69 @@ def test_maximum_drawdown_matches_drawdown():
         maximum_drawdown(prices),
         np.min(drawdown(prices)),
     )
+
+def test_calmar_ratio():
+    prices = np.array(
+        [100, 110, 105, 120, 115],
+        dtype=float,
+    )
+
+    cumulative_return = (prices[-1] / prices[0]) - 1
+
+    expected = (
+    annualized_return(
+        cumulative_return=cumulative_return,
+        periods=len(prices) - 1,
+        periods_per_year=252,
+    )
+    / abs(maximum_drawdown(prices))
+)
+
+    assert np.isclose(
+    calmar_ratio(
+        prices,
+        periods=len(prices) - 1,
+        periods_per_year=252,
+    ),
+    expected,
+)
+
+def test_calmar_ratio_zero_drawdown():
+    prices = np.array(
+        [100, 105, 110, 120],
+        dtype=float,
+    )
+
+    periods = len(prices) - 1
+
+    with pytest.raises(ValueError):
+        calmar_ratio(
+            prices,
+            periods=periods,
+            periods_per_year=252,
+        )
+
+def test_calmar_ratio_relationship():
+    prices = np.array(
+        [100, 120, 110, 130, 90],
+        dtype=float,
+    )
+
+    cumulative_return = (prices[-1] / prices[0]) - 1
+
+    expected = (
+    annualized_return(
+        cumulative_return=cumulative_return,
+        periods=len(prices) - 1,
+        periods_per_year=252,
+    )
+    / abs(maximum_drawdown(prices))
+)
+
+    assert np.isclose(
+    calmar_ratio(
+        prices,
+        periods=len(prices) - 1,
+    ),
+    expected,
+)

@@ -9,6 +9,7 @@ from numpy.typing import ArrayLike
 from .statistics import standard_deviation
 
 
+
 def historical_volatility(
     returns: ArrayLike,
     ddof: int = 1,
@@ -33,3 +34,246 @@ def historical_volatility(
         returns,
         ddof=ddof,
     )
+
+import numpy as np
+from numpy.typing import ArrayLike, NDArray
+
+
+def rolling_volatility(
+    returns: ArrayLike,
+    window: int = 20,
+    ddof: int = 1,
+) -> NDArray[np.float64]:
+    """
+    Compute rolling historical volatility.
+
+    Parameters
+    ----------
+    returns : array-like
+        Sequence of returns.
+
+    window : int, default=20
+        Rolling window length.
+
+    ddof : int, default=1
+        Delta degrees of freedom.
+
+    Returns
+    -------
+    numpy.ndarray
+        Rolling volatility values.
+
+    Raises
+    ------
+    ValueError
+        If the window size is invalid.
+    """
+    returns = np.asarray(returns, dtype=float)
+
+    if window <= 0:
+        raise ValueError(
+            "Window size must be positive."
+        )
+
+    if returns.size < window:
+        raise ValueError(
+            "Window size cannot exceed the number of observations."
+        )
+
+    rolling = []
+
+    for i in range(window, len(returns) + 1):
+        window_returns = returns[i - window:i]
+
+        rolling.append(
+            historical_volatility(
+                window_returns,
+                ddof=ddof,
+            )
+        )
+
+    return np.asarray(rolling)
+
+import numpy as np
+from numpy.typing import ArrayLike
+
+
+def downside_deviation(
+    returns: ArrayLike,
+    target: float = 0.0,
+) -> float:
+    """
+    Compute the downside deviation of a return series.
+
+    Parameters
+    ----------
+    returns : array-like
+        Sequence of returns.
+
+    target : float, default=0.0
+        Minimum acceptable return.
+
+    Returns
+    -------
+    float
+        Downside deviation.
+    """
+    returns = np.asarray(returns, dtype=float)
+
+    downside = np.minimum(
+        returns - target,
+        0.0,
+    )
+
+    return np.sqrt(
+        np.mean(
+            downside ** 2
+        )
+    )
+
+from .statistics import mean_return
+
+
+def sharpe_ratio(
+    returns: ArrayLike,
+    risk_free_rate: float = 0.0,
+    ddof: int = 1,
+) -> float:
+    """
+    Compute the Sharpe Ratio.
+
+    Parameters
+    ----------
+    returns : array-like
+        Sequence of returns.
+
+    risk_free_rate : float, default=0.0
+        Risk-free return expressed in the same periodicity
+        as the returns.
+
+    ddof : int, default=1
+        Delta degrees of freedom.
+
+    Returns
+    -------
+    float
+        Sharpe Ratio.
+
+    Raises
+    ------
+    ValueError
+        If volatility is zero.
+    """
+    avg_return = mean_return(returns)
+
+    volatility = historical_volatility(
+        returns,
+        ddof=ddof,
+    )
+
+    if np.isclose(volatility, 0.0):
+        raise ValueError(
+            "Sharpe Ratio is undefined when volatility is zero."
+        )
+
+    return (avg_return - risk_free_rate) / volatility
+
+def sortino_ratio(
+    returns: ArrayLike,
+    risk_free_rate: float = 0.0,
+    target: float = 0.0,
+) -> float:
+    """
+    Compute the Sortino Ratio.
+
+    Parameters
+    ----------
+    returns : array-like
+        Sequence of returns.
+
+    risk_free_rate : float, default=0.0
+        Risk-free return expressed in the same periodicity
+        as the returns.
+
+    target : float, default=0.0
+        Minimum acceptable return used to compute
+        downside deviation.
+
+    Returns
+    -------
+    float
+        Sortino Ratio.
+
+    Raises
+    ------
+    ValueError
+        If downside deviation is zero.
+    """
+    avg_return = mean_return(returns)
+
+    downside = downside_deviation(
+        returns,
+        target=target,
+    )
+
+    if np.isclose(downside, 0.0):
+        raise ValueError(
+            "Sortino Ratio is undefined when downside deviation is zero."
+        )
+
+    return (avg_return - risk_free_rate) / downside
+
+def drawdown(
+    prices: ArrayLike,
+) -> NDArray[np.float64]:
+    """
+    Compute the drawdown series from a price series.
+
+    Parameters
+    ----------
+    prices : array-like
+        Portfolio or asset values.
+
+    Returns
+    -------
+    numpy.ndarray
+        Drawdown series.
+
+    Raises
+    ------
+    ValueError
+        If the input is empty or contains non-positive values.
+    """
+    prices = np.asarray(prices, dtype=float)
+
+    if prices.size == 0:
+        raise ValueError(
+            "Price series cannot be empty."
+        )
+
+    if np.any(prices <= 0):
+        raise ValueError(
+            "Prices must be strictly positive."
+        )
+
+    running_max = np.maximum.accumulate(prices)
+
+    return (prices - running_max) / running_max
+
+def maximum_drawdown(
+    prices: ArrayLike,
+) -> float:
+    """
+    Compute the maximum drawdown of a price series.
+
+    Parameters
+    ----------
+    prices : array-like
+        Portfolio or asset values.
+
+    Returns
+    -------
+    float
+        Maximum drawdown.
+    """
+    return float(np.min(drawdown(prices)))

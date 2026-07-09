@@ -22,13 +22,22 @@ from .statistics import (
     covariance,
     correlation,
     kurtosis,
+    skewness,
     covariance_matrix,
     correlation_matrix,
-    
+   
 )
-from scipy.stats import skew
 
-from .risk import historical_volatility
+from .risk import (
+    historical_volatility,
+    rolling_volatility,
+    downside_deviation,
+    sharpe_ratio,
+    sortino_ratio,
+    drawdown,
+    maximum_drawdown,
+    )
+ 
 
 __all__ = [
     "arithmetic_returns",
@@ -38,7 +47,15 @@ __all__ = [
     "annualized_volatility",
     "mean_return",
     "variance",
-    "kurtosis"
+    "standard_deviation",
+    "kurtosis",
+    "skewness",
     "correlation_matrix",
     "historical_volatility",
+    "rolling_volatility",
+    "downside_deviation",
+    "sharpe_ratio",
+    "sortino_ratio",
+    "drawdown",
+    "maximum_drawdown",
 ]

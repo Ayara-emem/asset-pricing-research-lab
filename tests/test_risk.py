@@ -16,7 +16,8 @@ from asset_pricing_lab.risk import (
     maximum_drawdown,
     calmar_ratio,
     historical_var,
-    expected_shortfall
+    expected_shortfall,
+    tracking_error,
 
 )
 
@@ -462,3 +463,84 @@ def test_expected_shortfall_monotonic():
 
     assert es99 >= es95
 
+def test_tracking_error():
+    portfolio = np.array([
+        0.02,
+        0.01,
+        -0.01,
+        0.03,
+    ])
+
+    benchmark = np.array([
+        0.01,
+        0.02,
+        -0.02,
+        0.02,
+    ])
+
+    te = tracking_error(
+        portfolio,
+        benchmark,
+    )
+
+    assert te >= 0
+
+def test_tracking_error_identical_returns():
+    returns = np.array([
+        0.01,
+        0.02,
+        -0.01,
+        0.00,
+    ])
+
+    te = tracking_error(
+        returns,
+        returns,
+    )
+
+    assert te == 0.0
+
+def test_tracking_error_shape_mismatch():
+    portfolio = np.array([0.01, 0.02])
+
+    benchmark = np.array([0.01])
+
+    with pytest.raises(ValueError):
+        tracking_error(
+            portfolio,
+            benchmark,
+        )
+
+def test_tracking_error_empty_portfolio():
+    with pytest.raises(ValueError):
+        tracking_error([], [])
+
+
+def test_tracking_error_ddof():
+    portfolio = np.array([
+        0.01,
+        0.03,
+        -0.01,
+        0.02,
+    ])
+
+    benchmark = np.array([
+        0.00,
+        0.02,
+        -0.02,
+        0.01,
+    ])
+
+    te_sample = tracking_error(
+        portfolio,
+        benchmark,
+        ddof=1,
+    )
+
+    te_population = tracking_error(
+        portfolio,
+        benchmark,
+        ddof=0,
+    )
+
+    assert te_sample >= te_population

@@ -402,3 +402,63 @@ def expected_shortfall(
     tail_losses = returns[returns <= percentile]
 
     return -float(np.mean(tail_losses))
+
+
+def tracking_error(
+    portfolio_returns,
+    benchmark_returns,
+    ddof: int = 1,
+) -> float:
+    """
+    Compute the Tracking Error between a portfolio and its benchmark.
+
+    Parameters
+    ----------
+    portfolio_returns : array-like
+        Portfolio periodic returns.
+
+    benchmark_returns : array-like
+        Benchmark periodic returns.
+
+    ddof : int, default=1
+        Delta degrees of freedom.
+
+    Returns
+    -------
+    float
+        Tracking Error.
+    """
+    portfolio_returns = np.asarray(
+        portfolio_returns,
+        dtype=float,
+    )
+
+    benchmark_returns = np.asarray(
+        benchmark_returns,
+        dtype=float,
+    )
+
+    if portfolio_returns.size == 0:
+        raise ValueError(
+            "portfolio_returns must not be empty."
+        )
+
+    if benchmark_returns.size == 0:
+        raise ValueError(
+            "benchmark_returns must not be empty."
+        )
+
+    if portfolio_returns.shape != benchmark_returns.shape:
+        raise ValueError(
+            "portfolio_returns and benchmark_returns must have the same shape."
+        )
+
+    active_returns = (
+        portfolio_returns
+        - benchmark_returns
+    )
+
+    return standard_deviation(
+        active_returns,
+        ddof=ddof,
+    )

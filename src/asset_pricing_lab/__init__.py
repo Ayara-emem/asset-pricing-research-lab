@@ -25,7 +25,6 @@ from .statistics import (
     skewness,
     covariance_matrix,
     correlation_matrix,
-   
 )
 
 from .risk import (
@@ -39,8 +38,8 @@ from .risk import (
     calmar_ratio,
     historical_var,
     expected_shortfall,
-    )
- 
+    tracking_error,
+) 
 
 __all__ = [
     "arithmetic_returns",
@@ -64,4 +63,5 @@ __all__ = [
     "calmar_ratio",
     "historical_var",
     "expected_shortfall",
+    "tracking_error",
 ]

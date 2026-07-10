@@ -46,6 +46,7 @@ from .capm import (
     beta,
     alpha,
     capm_expected_return,
+    security_selection,
 )
 
 __all__ = [
@@ -75,4 +76,5 @@ __all__ = [
     "beta",
     "alpha",
     "capm_expected_return",
+    "security_selection"
 ]

@@ -119,3 +119,55 @@ def capm_expected_return(
         )
     )
 
+def security_selection(
+    asset_return: float,
+    risk_free_rate: float,
+    market_return: float,
+    beta: float,
+    atol: float = 1e-12,
+) -> str:
+    """
+    Classify an asset relative to the Security Market Line.
+
+    Parameters
+    ----------
+    asset_return : float
+        Observed or expected asset return.
+
+    risk_free_rate : float
+        Risk-free return.
+
+    market_return : float
+        Expected market return.
+
+    beta : float
+        CAPM Beta.
+
+    atol : float, default=1e-12
+        Absolute tolerance used when comparing returns.
+
+    Returns
+    -------
+    str
+        One of:
+        - "undervalued"
+        - "fairly valued"
+        - "overvalued"
+    """
+    expected = capm_expected_return(
+        risk_free_rate=risk_free_rate,
+        market_return=market_return,
+        beta=beta,
+    )
+
+    if np.isclose(
+        asset_return,
+        expected,
+        atol=atol,
+    ):
+        return "fairly valued"
+
+    if asset_return > expected:
+        return "undervalued"
+
+    return "overvalued"

@@ -6,6 +6,7 @@ from asset_pricing_lab.capm import (
     beta,
     alpha,
     capm_expected_return,
+    security_selection,
 )
 
 
@@ -245,3 +246,54 @@ def test_alpha_matches_capm_expected_return():
         0.0,
     )
 
+def test_security_selection_undervalued():
+    result = security_selection(
+        asset_return=0.10,
+        risk_free_rate=0.02,
+        market_return=0.08,
+        beta=1.0,
+    )
+
+    assert result == "undervalued"
+
+def test_security_selection_fair():
+    expected = capm_expected_return(
+        risk_free_rate=0.02,
+        market_return=0.08,
+        beta=1.2,
+    )
+
+    result = security_selection(
+        asset_return=expected,
+        risk_free_rate=0.02,
+        market_return=0.08,
+        beta=1.2,
+    )
+
+    assert result == "fairly valued"
+
+def test_security_selection_overvalued():
+    result = security_selection(
+        asset_return=0.04,
+        risk_free_rate=0.02,
+        market_return=0.08,
+        beta=1.0,
+    )
+
+    assert result == "overvalued"
+
+def test_security_selection_tolerance():
+    expected = capm_expected_return(
+        risk_free_rate=0.02,
+        market_return=0.08,
+        beta=1.0,
+    )
+
+    result = security_selection(
+        asset_return=expected + 1e-14,
+        risk_free_rate=0.02,
+        market_return=0.08,
+        beta=1.0,
+    )
+
+    assert result == "fairly valued"

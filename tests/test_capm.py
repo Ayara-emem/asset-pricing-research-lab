@@ -11,6 +11,7 @@ from asset_pricing_lab.capm import (
     residuals,
     security_selection,
     rolling_beta,
+    treynor_ratio,
 )
 
 
@@ -585,4 +586,60 @@ def test_rolling_beta_shape_mismatch():
             [0.01],
             window=2,
         )
+
+def test_treynor_ratio():
+    ratio = treynor_ratio(
+        portfolio_return=0.12,
+        risk_free_rate=0.02,
+        beta=1.25,
+    )
+
+    assert np.isclose(
+        ratio,
+        0.08,
+    )
+
+def test_treynor_ratio_negative_beta():
+    ratio = treynor_ratio(
+        portfolio_return=0.08,
+        risk_free_rate=0.02,
+        beta=-1.0,
+    )
+
+    assert np.isclose(
+        ratio,
+        -0.06,
+    )
+
+def test_treynor_ratio_zero_beta():
+    ratio = treynor_ratio(
+        portfolio_return=0.10,
+        risk_free_rate=0.02,
+        beta=0.0,
+    )
+
+    assert np.isnan(
+        ratio
+    )
+
+def test_treynor_ratio_negative_excess_return():
+    ratio = treynor_ratio(
+        portfolio_return=0.01,
+        risk_free_rate=0.02,
+        beta=1.0,
+    )
+
+    assert ratio < 0
+
+def test_treynor_ratio_zero():
+    ratio = treynor_ratio(
+        portfolio_return=0.03,
+        risk_free_rate=0.03,
+        beta=2.0,
+    )
+
+    assert np.isclose(
+        ratio,
+        0.0,
+    )
 

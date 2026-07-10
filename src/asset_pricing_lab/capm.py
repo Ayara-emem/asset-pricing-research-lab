@@ -429,3 +429,35 @@ def rolling_beta(
 
     return np.asarray(betas)
 
+def treynor_ratio(
+    portfolio_return: float,
+    risk_free_rate: float,
+    beta: float,
+) -> float:
+    """
+    Compute the Treynor Ratio.
+
+    Parameters
+    ----------
+    portfolio_return : float
+        Portfolio return.
+
+    risk_free_rate : float
+        Risk-free return.
+
+    beta : float
+        Portfolio Beta.
+
+    Returns
+    -------
+    float
+        Treynor Ratio.
+        Returns np.nan if beta is zero.
+    """
+    if np.isclose(beta, 0.0):
+        return np.nan
+
+    return (
+        portfolio_return
+        - risk_free_rate
+    ) / beta

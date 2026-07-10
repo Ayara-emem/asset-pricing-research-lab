@@ -51,6 +51,7 @@ from .capm import (
     r_squared,
     estimate_capm,
     rolling_beta,
+    treynor_ratio,
 
 )
 
@@ -86,6 +87,6 @@ __all__ = [
     "r_squared",
     "estimate_capm",
     "rolling_beta",
-    
+    "treynor_ratio"
 
 ]

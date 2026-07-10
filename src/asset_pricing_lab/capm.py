@@ -345,3 +345,87 @@ def estimate_capm(
         "alpha": a,
         "beta": b,
     }
+
+
+def rolling_beta(
+    asset_returns,
+    market_returns,
+    window: int = 252,
+    ddof: int = 1,
+):
+    """
+    Compute rolling CAPM Beta.
+
+    Parameters
+    ----------
+    asset_returns : array-like
+        Asset periodic returns.
+
+    market_returns : array-like
+        Market periodic returns.
+
+    window : int, default=252
+        Rolling window size.
+
+    ddof : int, default=1
+        Delta degrees of freedom.
+
+    Returns
+    -------
+    numpy.ndarray
+        Rolling Beta estimates.
+    """
+    asset_returns = np.asarray(
+        asset_returns,
+        dtype=float,
+    )
+
+    market_returns = np.asarray(
+        market_returns,
+        dtype=float,
+    )
+
+    if asset_returns.size == 0:
+        raise ValueError(
+            "asset_returns must not be empty."
+        )
+
+    if market_returns.size == 0:
+        raise ValueError(
+            "market_returns must not be empty."
+        )
+
+    if asset_returns.shape != market_returns.shape:
+        raise ValueError(
+            "asset_returns and market_returns must have the same shape."
+        )
+
+    if window <= 0:
+        raise ValueError(
+            "window must be positive."
+        )
+
+    if window > asset_returns.size:
+        raise ValueError(
+            "window must not exceed the number of observations."
+        )
+
+    betas = []
+
+    for i in range(
+        asset_returns.size - window + 1
+    ):
+        b = beta(
+            asset_returns[
+                i:i + window
+            ],
+            market_returns[
+                i:i + window
+            ],
+            ddof=ddof,
+        )
+
+        betas.append(b)
+
+    return np.asarray(betas)
+

@@ -10,6 +10,7 @@ from asset_pricing_lab.capm import (
     r_squared,
     residuals,
     security_selection,
+    rolling_beta,
 )
 
 
@@ -495,4 +496,93 @@ def test_estimate_capm_shape_mismatch():
 def test_estimate_capm_empty():
     with pytest.raises(ValueError):
         estimate_capm([], [])
+
+def test_rolling_beta():
+    asset = np.array([
+        0.02,
+        0.03,
+        0.01,
+        0.04,
+        0.05,
+    ])
+
+    market = np.array([
+        0.01,
+        0.02,
+        0.00,
+        0.03,
+        0.04,
+    ])
+
+    result = rolling_beta(
+        asset,
+        market,
+        window=3,
+    )
+
+    assert len(result) == 3
+
+def test_rolling_beta_perfect():
+    market = np.array([
+        0.01,
+        0.02,
+        0.03,
+        0.04,
+        0.05,
+    ])
+
+    result = rolling_beta(
+        market,
+        market,
+        window=3,
+    )
+
+    assert np.allclose(
+        result,
+        1.0,
+    )
+
+def test_rolling_beta_invalid_window():
+    asset = np.array([
+        0.01,
+        0.02,
+    ])
+
+    market = np.array([
+        0.01,
+        0.02,
+    ])
+
+    with pytest.raises(ValueError):
+        rolling_beta(
+            asset,
+            market,
+            window=0,
+        )
+
+def test_rolling_beta_window_too_large():
+    asset = np.array([
+        0.01,
+        0.02,
+    ])
+
+    market = np.array([
+        0.01,
+        0.02,
+    ])
+
+    with pytest.raises(ValueError):
+        rolling_beta(
+            asset,
+            market,
+            window=5,
+        )
+
+def test_rolling_beta_shape_mismatch():
+    with pytest.raises(ValueError):
+        rolling_beta(
+            [0.01, 0.02],
+            [0.01],
+            window=2,
+        )
 

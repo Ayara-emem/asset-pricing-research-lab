@@ -7,6 +7,8 @@ from asset_pricing_lab.fama_french import (
     predicted_returns_fama_french,
     residuals_fama_french,
     r_squared_fama_french,
+    rolling_fama_french,
+
 
 )
 
@@ -308,3 +310,73 @@ def test_fama_french_r_squared_zero_variance():
     result = r_squared_fama_french(actual, predicted)
 
     assert result == 1.0
+
+def test_rolling_fama_french_output_length():
+    import numpy as np
+
+    n = 10
+    window = 5
+
+    asset = np.linspace(0.01, 0.10, n)
+    market = np.linspace(0.02, 0.11, n)
+    smb = np.linspace(-0.01, 0.01, n)
+    hml = np.linspace(0.03, -0.02, n)
+
+    result = rolling_fama_french(
+        asset,
+        market,
+        smb,
+        hml,
+        window=window,
+    )
+
+    expected = n - window + 1
+
+    assert len(result["alpha"]) == expected
+    assert len(result["market_beta"]) == expected
+    assert len(result["smb_beta"]) == expected
+    assert len(result["hml_beta"]) == expected
+
+import pytest
+
+def test_rolling_fama_french_window_too_large():
+    asset = np.arange(5.0)
+
+    with pytest.raises(ValueError):
+        rolling_fama_french(
+            asset,
+            asset,
+            asset,
+            asset,
+            window=6,
+        )
+
+def test_rolling_fama_french_window_too_small():
+    asset = np.arange(5.0)
+
+    with pytest.raises(ValueError):
+        rolling_fama_french(
+            asset,
+            asset,
+            asset,
+            asset,
+            window=1,
+        )
+
+def test_rolling_fama_french_shape_error():
+    import numpy as np
+    import pytest
+
+    asset = np.arange(6.0)
+    market = np.arange(6.0)
+    smb = np.arange(5.0)
+    hml = np.arange(6.0)
+
+    with pytest.raises(ValueError):
+        rolling_fama_french(
+            asset,
+            market,
+            smb,
+            hml,
+            window=3,
+        )

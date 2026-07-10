@@ -60,6 +60,7 @@ from .fama_french import (
     predicted_returns_fama_french,
     residuals_fama_french,
     r_squared_fama_french,
+    rolling_fama_french,
 
 
 )
@@ -100,5 +101,6 @@ __all__ = [
     "estimate_fama_french",
     "predicted_returns_fama_french",
     "residuals_fama_french"
-    "r_squared_fama_french"
+    "r_squared_fama_french",
+    "rolling_fama_french"
 ]

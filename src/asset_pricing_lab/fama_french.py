@@ -248,3 +248,72 @@ def r_squared_fama_french(
         return 1.0 if np.isclose(ss_res, 0.0) else 0.0
 
     return 1.0 - ss_res / ss_tot
+
+import numpy as np
+
+def rolling_fama_french(
+    asset_returns,
+    market_excess,
+    smb,
+    hml,
+    window=60,
+):
+    """
+    Estimate rolling Fama-French factor loadings.
+
+    Parameters
+    ----------
+    asset_returns : array-like
+    market_excess : array-like
+    smb : array-like
+    hml : array-like
+    window : int, default=60
+
+    Returns
+    -------
+    dict
+        Dictionary containing NumPy arrays with rolling
+        alpha, market_beta, smb_beta and hml_beta.
+    """
+    asset = np.asarray(asset_returns, dtype=float)
+    market = np.asarray(market_excess, dtype=float)
+    smb = np.asarray(smb, dtype=float)
+    hml = np.asarray(hml, dtype=float)
+
+    n = len(asset)
+
+    if not (len(market) == len(smb) == len(hml) == n):
+        raise ValueError("All input arrays must have the same length.")
+
+    if window < 2:
+        raise ValueError("window must be at least 2.")
+
+    if window > n:
+        raise ValueError("window cannot exceed the number of observations.")
+
+    alpha = []
+    market_beta = []
+    smb_beta = []
+    hml_beta = []
+
+    for start in range(n - window + 1):
+        stop = start + window
+
+        result = estimate_fama_french(
+            asset[start:stop],
+            market[start:stop],
+            smb[start:stop],
+            hml[start:stop],
+        )
+
+        alpha.append(result["alpha"])
+        market_beta.append(result["market_beta"])
+        smb_beta.append(result["smb_beta"])
+        hml_beta.append(result["hml_beta"])
+
+    return {
+        "alpha": np.asarray(alpha),
+        "market_beta": np.asarray(market_beta),
+        "smb_beta": np.asarray(smb_beta),
+        "hml_beta": np.asarray(hml_beta),
+    }

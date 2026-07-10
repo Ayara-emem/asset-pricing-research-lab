@@ -6,6 +6,9 @@ from asset_pricing_lab.capm import (
     beta,
     alpha,
     capm_expected_return,
+    estimate_capm,
+    r_squared,
+    residuals,
     security_selection,
 )
 
@@ -297,3 +300,199 @@ def test_security_selection_tolerance():
     )
 
     assert result == "fairly valued"
+
+def test_residuals():
+    actual = np.array([
+        0.05,
+        0.06,
+        0.04,
+    ])
+
+    predicted = np.array([
+        0.04,
+        0.05,
+        0.05,
+    ])
+
+    r = residuals(
+        actual,
+        predicted,
+    )
+
+    expected = np.array([
+        0.01,
+        0.01,
+        -0.01,
+    ])
+
+    assert np.allclose(
+        r,
+        expected,
+    )
+
+def test_residuals_zero():
+    x = np.array([
+        0.01,
+        0.02,
+    ])
+
+    r = residuals(
+        x,
+        x,
+    )
+
+    assert np.allclose(
+        r,
+        0
+    )
+
+def test_residuals_empty():
+    with pytest.raises(ValueError):
+        residuals([], [])
+
+def test_residuals_shape_mismatch():
+    with pytest.raises(ValueError):
+        residuals(
+            [1,2],
+            [1],
+        )
+def test_r_squared_perfect():
+    x = np.array([
+        0.01,
+        0.02,
+        0.03,
+    ])
+
+    r2 = r_squared(
+        x,
+        x,
+    )
+
+    assert np.isclose(
+        r2,
+        1.0,
+    )
+
+def test_r_squared():
+    actual = np.array([
+        1,
+        2,
+        3,
+    ])
+
+    predicted = np.array([
+        1,
+        2,
+        2,
+    ])
+
+    r2 = r_squared(
+        actual,
+        predicted,
+    )
+
+    assert 0 <= r2 <= 1
+
+def test_r_squared_zero_variance():
+    actual = np.array([
+        2,
+        2,
+        2,
+    ])
+
+    predicted = np.array([
+        2,
+        2,
+        2,
+    ])
+
+    r2 = r_squared(
+        actual,
+        predicted,
+    )
+
+    assert np.isnan(r2)
+
+def test_estimate_capm_keys():
+    asset = np.array([
+        0.03,
+        0.01,
+        -0.01,
+        0.02,
+    ])
+
+    market = np.array([
+        0.02,
+        0.01,
+        -0.02,
+        0.01,
+    ])
+
+    result = estimate_capm(
+        asset,
+        market,
+    )
+
+    assert "alpha" in result
+    assert "beta" in result
+
+def test_estimate_capm_beta_one():
+    market = np.array([
+        0.01,
+        0.03,
+        -0.02,
+        0.04,
+    ])
+
+    result = estimate_capm(
+        market,
+        market,
+    )
+
+    assert np.isclose(
+        result["beta"],
+        1.0,
+    )
+
+    assert np.isclose(
+        result["alpha"],
+        0.0,
+    )
+
+def test_estimate_capm_zero_market_variance():
+    asset = np.array([
+        0.01,
+        0.02,
+        0.03,
+    ])
+
+    market = np.array([
+        0.02,
+        0.02,
+        0.02,
+    ])
+
+    result = estimate_capm(
+        asset,
+        market,
+    )
+
+    assert np.isnan(
+        result["beta"]
+    )
+
+    assert np.isnan(
+        result["alpha"]
+    )
+
+def test_estimate_capm_shape_mismatch():
+    with pytest.raises(ValueError):
+        estimate_capm(
+            [0.01, 0.02],
+            [0.01],
+        )
+
+def test_estimate_capm_empty():
+    with pytest.raises(ValueError):
+        estimate_capm([], [])
+

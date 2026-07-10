@@ -171,3 +171,177 @@ def security_selection(
         return "undervalued"
 
     return "overvalued"
+
+def residuals(
+    asset_returns,
+    predicted_returns,
+):
+    """
+    Compute regression residuals.
+
+    Parameters
+    ----------
+    asset_returns : array-like
+        Actual asset returns.
+
+    predicted_returns : array-like
+        Predicted asset returns.
+
+    Returns
+    -------
+    numpy.ndarray
+        Regression residuals.
+    """
+    asset_returns = np.asarray(
+        asset_returns,
+        dtype=float,
+    )
+
+    predicted_returns = np.asarray(
+        predicted_returns,
+        dtype=float,
+    )
+
+    if asset_returns.size == 0:
+        raise ValueError(
+            "asset_returns must not be empty."
+        )
+
+    if predicted_returns.size == 0:
+        raise ValueError(
+            "predicted_returns must not be empty."
+        )
+
+    if asset_returns.shape != predicted_returns.shape:
+        raise ValueError(
+            "asset_returns and predicted_returns must have the same shape."
+        )
+
+    return asset_returns - predicted_returns
+
+def r_squared(
+    asset_returns,
+    predicted_returns,
+):
+    """
+    Compute coefficient of determination.
+
+    Parameters
+    ----------
+    asset_returns : array-like
+
+    predicted_returns : array-like
+
+    Returns
+    -------
+    float
+        R² statistic.
+    """
+    asset_returns = np.asarray(
+        asset_returns,
+        dtype=float,
+    )
+
+    predicted_returns = np.asarray(
+        predicted_returns,
+        dtype=float,
+    )
+
+    res = residuals(
+        asset_returns,
+        predicted_returns,
+    )
+
+    ss_res = np.sum(
+        res ** 2
+    )
+
+    ss_tot = np.sum(
+        (
+            asset_returns
+            - np.mean(asset_returns)
+        ) ** 2
+    )
+
+    if np.isclose(
+        ss_tot,
+        0.0,
+    ):
+        return np.nan
+
+    return 1 - (
+        ss_res
+        / ss_tot
+    )
+
+from .statistics import mean_return
+
+
+def estimate_capm(
+    asset_returns,
+    market_returns,
+    ddof: int = 1,
+) -> dict:
+    """
+    Estimate CAPM regression parameters.
+
+    Parameters
+    ----------
+    asset_returns : array-like
+        Asset periodic returns.
+
+    market_returns : array-like
+        Market periodic returns.
+
+    ddof : int, default=1
+        Delta degrees of freedom used in Beta estimation.
+
+    Returns
+    -------
+    dict
+        Dictionary containing the estimated
+        alpha and beta.
+    """
+    asset_returns = np.asarray(
+        asset_returns,
+        dtype=float,
+    )
+
+    market_returns = np.asarray(
+        market_returns,
+        dtype=float,
+    )
+
+    if asset_returns.size == 0:
+        raise ValueError(
+            "asset_returns must not be empty."
+        )
+
+    if market_returns.size == 0:
+        raise ValueError(
+            "market_returns must not be empty."
+        )
+
+    if asset_returns.shape != market_returns.shape:
+        raise ValueError(
+            "asset_returns and market_returns must have the same shape."
+        )
+
+    b = beta(
+        asset_returns,
+        market_returns,
+        ddof=ddof,
+    )
+
+    if np.isnan(b):
+        a = np.nan
+    else:
+        a = (
+            mean_return(asset_returns)
+            - b * mean_return(market_returns)
+        )
+
+    return {
+        "alpha": a,
+        "beta": b,
+    }

@@ -52,9 +52,17 @@ from .capm import (
     estimate_capm,
     rolling_beta,
     treynor_ratio,
-
 )
 
+from .fama_french import (
+    fama_french_expected_return,
+    estimate_fama_french,
+    predicted_returns_fama_french,
+    residuals_fama_french,
+    r_squared_fama_french,
+
+
+)
 __all__ = [
     "arithmetic_returns",
     "log_returns",
@@ -87,6 +95,10 @@ __all__ = [
     "r_squared",
     "estimate_capm",
     "rolling_beta",
-    "treynor_ratio"
-
+    "treynor_ratio",
+    "fama_french_expected_return",
+    "estimate_fama_french",
+    "predicted_returns_fama_french",
+    "residuals_fama_french"
+    "r_squared_fama_french"
 ]

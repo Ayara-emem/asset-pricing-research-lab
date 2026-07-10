@@ -5,6 +5,7 @@ import pytest
 from asset_pricing_lab.capm import (
     beta,
     alpha,
+    capm_expected_return,
 )
 
 
@@ -177,4 +178,70 @@ def test_alpha_negative_beta():
         expected,
     )
 
+def test_capm_expected_return():
+    expected = capm_expected_return(
+        risk_free_rate=0.02,
+        market_return=0.08,
+        beta=1.5,
+    )
+
+    assert np.isclose(
+        expected,
+        0.11,
+    )
+
+def test_capm_expected_return_beta_zero():
+    expected = capm_expected_return(
+        risk_free_rate=0.03,
+        market_return=0.12,
+        beta=0,
+    )
+
+    assert np.isclose(
+        expected,
+        0.03,
+    )
+
+def test_capm_expected_return_beta_one():
+    expected = capm_expected_return(
+        risk_free_rate=0.02,
+        market_return=0.09,
+        beta=1,
+    )
+
+    assert np.isclose(
+        expected,
+        0.09,
+    )
+
+def test_capm_expected_return_negative_beta():
+    expected = capm_expected_return(
+        risk_free_rate=0.02,
+        market_return=0.08,
+        beta=-1,
+    )
+
+    assert np.isclose(
+        expected,
+        -0.04,
+    )
+
+def test_alpha_matches_capm_expected_return():
+    expected = capm_expected_return(
+        risk_free_rate=0.02,
+        market_return=0.08,
+        beta=1.2,
+    )
+
+    a = alpha(
+        asset_return=expected,
+        market_return=0.08,
+        risk_free_rate=0.02,
+        beta=1.2,
+    )
+
+    assert np.isclose(
+        a,
+        0.0,
+    )
 

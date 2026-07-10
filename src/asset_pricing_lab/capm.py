@@ -77,17 +77,30 @@ def alpha(
 ) -> float:
     """
     Compute Jensen's Alpha.
+    """
+    expected_return = capm_expected_return(
+        risk_free_rate=risk_free_rate,
+        market_return=market_return,
+        beta=beta,
+    )
+
+    return asset_return - expected_return
+
+def capm_expected_return(
+    risk_free_rate: float,
+    market_return: float,
+    beta: float,
+) -> float:
+    """
+    Compute the CAPM expected return.
 
     Parameters
     ----------
-    asset_return : float
-        Observed asset return.
-
-    market_return : float
-        Observed market return.
-
     risk_free_rate : float
         Risk-free return.
+
+    market_return : float
+        Expected market return.
 
     beta : float
         Estimated CAPM Beta.
@@ -95,9 +108,9 @@ def alpha(
     Returns
     -------
     float
-        Jensen's Alpha.
+        CAPM expected return.
     """
-    expected_return = (
+    return (
         risk_free_rate
         + beta
         * (
@@ -106,7 +119,3 @@ def alpha(
         )
     )
 
-    return (
-        asset_return
-        - expected_return
-    )

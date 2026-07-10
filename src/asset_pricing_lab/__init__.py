@@ -45,6 +45,7 @@ from .risk import (
 from .capm import (
     beta,
     alpha,
+    capm_expected_return,
 )
 
 __all__ = [
@@ -73,4 +74,5 @@ __all__ = [
     "information_ratio",
     "beta",
     "alpha",
+    "capm_expected_return",
 ]

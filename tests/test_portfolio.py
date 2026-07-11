@@ -10,6 +10,10 @@ from asset_pricing_lab.portfolio import (
     portfolio_volatility,
     covariance_matrix,
     diversification_ratio,
+    simulate_portfolios,
+    global_minimum_variance_portfolio,
+
+
 )
 
 
@@ -165,6 +169,128 @@ def test_diversification_ratio_zero_volatility():
     with pytest.raises(ValueError):
         diversification_ratio(
             np.array([0.5, 0.5]),
+            covariance,
+        )
+
+def test_simulate_portfolios_shapes():
+
+    expected_returns = np.array(
+        [0.08,0.10,0.12]
+    )
+
+    covariance = np.eye(3)
+
+    result = simulate_portfolios(
+        expected_returns,
+        covariance,
+        n_portfolios=100,
+        random_state=42,
+    )
+
+    assert result["weights"].shape == (
+        100,
+        3,
+    )
+
+    assert result["returns"].shape == (
+        100,
+    )
+
+    assert result["volatility"].shape == (
+        100,
+    )
+
+def test_simulated_weights_sum_to_one():
+
+    result = simulate_portfolios(
+        np.array([0.08,0.10]),
+
+        np.eye(2),
+
+        n_portfolios=50,
+
+        random_state=42,
+    )
+
+    assert np.allclose(
+        result["weights"].sum(axis=1),
+        np.ones(50),
+    )
+
+def test_simulate_portfolios_invalid_covariance():
+
+    with pytest.raises(ValueError):
+
+        simulate_portfolios(
+
+            np.array([0.08,0.10]),
+
+            np.eye(3),
+        )
+
+def test_simulate_portfolios_invalid_count():
+
+    with pytest.raises(ValueError):
+
+        simulate_portfolios(
+
+            np.array([0.08]),
+
+            np.eye(1),
+
+            n_portfolios=0,
+        )
+
+
+def test_gmvp_weights_sum_to_one():
+    covariance = np.array([
+        [0.04, 0.01],
+        [0.01, 0.09],
+    ])
+
+    result = global_minimum_variance_portfolio(
+        covariance,
+    )
+
+    assert np.isclose(
+        result["weights"].sum(),
+        1.0,
+    )
+
+def test_gmvp_output_keys():
+    covariance = np.array([
+        [0.04, 0.01],
+        [0.01, 0.09],
+    ])
+
+    result = global_minimum_variance_portfolio(
+        covariance,
+    )
+
+    assert set(result.keys()) == {
+        "weights",
+        "variance",
+        "volatility",
+    }
+
+import pytest
+
+def test_gmvp_singular_matrix():
+    covariance = np.array([
+        [1.0, 2.0],
+        [2.0, 4.0],
+    ])
+
+    with pytest.raises(ValueError):
+        global_minimum_variance_portfolio(
+            covariance,
+        )
+
+def test_gmvp_non_square():
+    covariance = np.ones((2, 3))
+
+    with pytest.raises(ValueError):
+        global_minimum_variance_portfolio(
             covariance,
         )
 

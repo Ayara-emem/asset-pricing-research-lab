@@ -226,3 +226,165 @@ def diversification_ratio(
         weighted_average_volatility
         / portfolio_vol
     )
+
+import numpy as np
+
+
+def simulate_portfolios(
+    expected_returns,
+    covariance_matrix,
+    n_portfolios=10000,
+    random_state=None,
+):
+    """
+    Simulate random portfolios.
+
+    Parameters
+    ----------
+    expected_returns : array-like
+        Expected returns.
+
+    covariance_matrix : array-like
+        Covariance matrix.
+
+    n_portfolios : int
+        Number of portfolios.
+
+    random_state : int or None
+        Random seed.
+
+    Returns
+    -------
+    dict
+        Simulated portfolios.
+    """
+    expected_returns = np.asarray(
+        expected_returns,
+        dtype=float,
+    )
+
+    covariance_matrix = np.asarray(
+        covariance_matrix,
+        dtype=float,
+    )
+
+    n_assets = len(expected_returns)
+
+    if covariance_matrix.shape != (
+        n_assets,
+        n_assets,
+    ):
+        raise ValueError(
+            "covariance_matrix has incorrect shape."
+        )
+
+    if n_portfolios <= 0:
+        raise ValueError(
+            "n_portfolios must be positive."
+        )
+
+    rng = np.random.default_rng(
+        random_state
+    )
+
+    weights = np.empty(
+        (n_portfolios, n_assets)
+    )
+
+    portfolio_returns = np.empty(
+        n_portfolios
+    )
+
+    portfolio_volatilities = np.empty(
+    n_portfolios
+    )
+
+    for i in range(n_portfolios):
+
+        w = rng.random(n_assets)
+
+        w /= w.sum()
+
+        weights[i] = w
+
+        portfolio_returns[i] = (
+            portfolio_expected_return(
+                w,
+                expected_returns,
+            )
+        )
+
+        portfolio_volatilities[i] = portfolio_volatility(
+            w,
+            covariance_matrix,
+            )
+
+    return {
+        "weights": weights,
+        "returns": portfolio_returns,
+        "volatility": portfolio_volatilities,
+    }
+
+import numpy as np
+
+
+def global_minimum_variance_portfolio(
+    covariance_matrix,
+):
+    """
+    Compute the Global Minimum Variance Portfolio.
+
+    Parameters
+    ----------
+    covariance_matrix : array-like
+        Covariance matrix.
+
+    Returns
+    -------
+    dict
+        Portfolio weights, variance and volatility.
+    """
+    covariance_matrix = np.asarray(
+        covariance_matrix,
+        dtype=float,
+    )
+
+    if covariance_matrix.ndim != 2:
+        raise ValueError(
+            "covariance_matrix must be two-dimensional."
+        )
+
+    n, m = covariance_matrix.shape
+
+    if n != m:
+        raise ValueError(
+            "covariance_matrix must be square."
+        )
+
+    ones = np.ones(n)
+
+    try:
+        inv_cov = np.linalg.inv(covariance_matrix)
+    except np.linalg.LinAlgError as exc:
+        raise ValueError(
+            "covariance_matrix is singular."
+        ) from exc
+
+    weights = inv_cov @ ones
+    weights /= ones @ weights
+
+    variance = portfolio_variance(
+        weights,
+        covariance_matrix,
+    )
+
+    volatility = portfolio_volatility(
+        weights,
+        covariance_matrix,
+    )
+
+    return {
+        "weights": weights,
+        "variance": variance,
+        "volatility": volatility,
+    }

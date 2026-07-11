@@ -69,7 +69,8 @@ from .fama_french import (
 
 from .portfolio import (
     portfolio_expected_return,
-    
+    portfolio_variance,
+    portfolio_volatility,
 )
 
 __all__ = [
@@ -117,5 +118,6 @@ __all__ = [
     "information_ratio",
     "appraisal_ratio",
     "portfolio_expected_return",
-    
+    "portfolio_variance",
+    "portfolio_volatility"
 ]

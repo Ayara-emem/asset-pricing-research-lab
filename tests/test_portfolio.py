@@ -5,6 +5,8 @@ import pytest
 
 from asset_pricing_lab.portfolio import (
     portfolio_expected_return,
+    portfolio_variance,
+    portfolio_volatility,
 )
 
 
@@ -29,3 +31,61 @@ def test_portfolio_expected_return_shape_error():
             np.array([0.5, 0.5]),
             np.array([0.10]),
         )
+
+def test_portfolio_variance():
+    weights = np.array([0.5, 0.5])
+
+    covariance = np.array([
+        [0.04, 0.01],
+        [0.01, 0.09],
+    ])
+
+    result = portfolio_variance(
+        weights,
+        covariance,
+    )
+
+    assert np.isclose(result, 0.0375)
+
+def test_portfolio_volatility():
+    weights = np.array([0.5, 0.5])
+
+    covariance = np.array([
+        [0.04, 0.01],
+        [0.01, 0.09],
+    ])
+
+    result = portfolio_volatility(
+        weights,
+        covariance,
+    )
+
+    expected = np.sqrt(0.0375)
+
+    assert np.isclose(result, expected)
+
+def test_portfolio_variance_invalid_shape():
+    weights = np.array([0.5, 0.5])
+
+    covariance = np.array([
+        [0.04],
+        [0.01],
+    ])
+
+    with pytest.raises(ValueError):
+        portfolio_variance(
+            weights,
+            covariance,
+        )
+
+def test_portfolio_variance_not_matrix():
+    weights = np.array([0.5, 0.5])
+
+    covariance = np.array([0.04, 0.09])
+
+    with pytest.raises(ValueError):
+        portfolio_variance(
+            weights,
+            covariance,
+        )
+

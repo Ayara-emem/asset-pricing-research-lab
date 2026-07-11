@@ -4,9 +4,11 @@ import numpy as np
 import pytest
 
 from asset_pricing_lab.portfolio import (
+    correlation_matrix,
     portfolio_expected_return,
     portfolio_variance,
     portfolio_volatility,
+    covariance_matrix,
 )
 
 
@@ -89,3 +91,45 @@ def test_portfolio_variance_not_matrix():
             covariance,
         )
 
+def test_covariance_matrix_shape():
+    returns = np.array([
+        [0.01, 0.02],
+        [0.03, 0.01],
+        [0.02, 0.04],
+    ])
+
+    cov = covariance_matrix(returns)
+
+    assert cov.shape == (2, 2)
+
+def test_covariance_matrix_is_symmetric():
+    returns = np.array([
+        [0.01, 0.02],
+        [0.03, 0.01],
+        [0.02, 0.04],
+    ])
+
+    cov = covariance_matrix(returns)
+
+    assert np.allclose(cov, cov.T)
+
+def test_correlation_matrix_diagonal():
+    returns = np.array([
+        [0.01, 0.02],
+        [0.03, 0.01],
+        [0.02, 0.04],
+    ])
+    corr = correlation_matrix(returns)
+
+    assert np.allclose(
+        np.diag(corr),
+        np.ones(2),
+    )
+
+import pytest
+
+def test_covariance_matrix_not_2d():
+    with pytest.raises(ValueError):
+        covariance_matrix(
+            np.array([1, 2, 3]),
+        )

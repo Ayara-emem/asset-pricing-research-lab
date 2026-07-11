@@ -96,3 +96,68 @@ def portfolio_volatility(
     )
 
     return float(np.sqrt(variance))
+
+import numpy as np
+
+
+def covariance_matrix(
+    returns,
+    ddof=1,
+):
+    """
+    Compute the covariance matrix of asset returns.
+
+    Parameters
+    ----------
+    returns : array-like
+        Matrix of returns with rows representing observations
+        and columns representing assets.
+
+    ddof : int, default=1
+        Delta degrees of freedom.
+
+    Returns
+    -------
+    numpy.ndarray
+        Covariance matrix.
+    """
+    returns = np.asarray(returns, dtype=float)
+
+    if returns.ndim != 2:
+        raise ValueError(
+            "returns must be a two-dimensional array."
+        )
+
+    return np.cov(
+        returns,
+        rowvar=False,
+        ddof=ddof,
+    )
+
+def correlation_matrix(
+    returns,
+):
+    """
+    Compute the correlation matrix of asset returns.
+
+    Parameters
+    ----------
+    returns : array-like
+        Matrix of asset returns.
+
+    Returns
+    -------
+    numpy.ndarray
+        Correlation matrix.
+    """
+    returns = np.asarray(returns, dtype=float)
+
+    if returns.ndim != 2:
+        raise ValueError(
+            "returns must be a two-dimensional array."
+        )
+
+    return np.corrcoef(
+        returns,
+        rowvar=False,
+    )

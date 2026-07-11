@@ -65,7 +65,11 @@ from .fama_french import (
     rolling_fama_french,
     factor_attribution,
     factor_exposure_report,
+)
 
+from .portfolio import (
+    portfolio_expected_return,
+    
 )
 
 __all__ = [
@@ -112,4 +116,6 @@ __all__ = [
     "adjusted_r_squared",
     "information_ratio",
     "appraisal_ratio",
+    "portfolio_expected_return",
+    
 ]

@@ -161,3 +161,68 @@ def correlation_matrix(
         returns,
         rowvar=False,
     )
+
+import numpy as np
+
+
+def diversification_ratio(
+    weights,
+    covariance_matrix,
+):
+    """
+    Compute the diversification ratio.
+
+    Parameters
+    ----------
+    weights : array-like
+        Portfolio weights.
+
+    covariance_matrix : array-like
+        Covariance matrix.
+
+    Returns
+    -------
+    float
+        Diversification ratio.
+    """
+    weights = np.asarray(weights, dtype=float)
+    covariance_matrix = np.asarray(
+        covariance_matrix,
+        dtype=float,
+    )
+
+    if covariance_matrix.ndim != 2:
+        raise ValueError(
+            "covariance_matrix must be two-dimensional."
+        )
+
+    n = len(weights)
+
+    if covariance_matrix.shape != (n, n):
+        raise ValueError(
+            "covariance_matrix shape must match weights."
+        )
+
+    asset_volatility = np.sqrt(
+        np.diag(covariance_matrix)
+    )
+
+    weighted_average_volatility = np.dot(
+        weights,
+        asset_volatility,
+    )
+
+    portfolio_vol = portfolio_volatility(
+        weights,
+        covariance_matrix,
+    )
+
+    if np.isclose(portfolio_vol, 0.0):
+        raise ValueError(
+            "Portfolio volatility is zero."
+        )
+
+    return (
+        weighted_average_volatility
+        / portfolio_vol
+    )

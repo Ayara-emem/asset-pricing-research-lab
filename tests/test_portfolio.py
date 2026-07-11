@@ -9,6 +9,7 @@ from asset_pricing_lab.portfolio import (
     portfolio_variance,
     portfolio_volatility,
     covariance_matrix,
+    diversification_ratio,
 )
 
 
@@ -133,3 +134,37 @@ def test_covariance_matrix_not_2d():
         covariance_matrix(
             np.array([1, 2, 3]),
         )
+
+def test_diversification_ratio():
+    weights = np.array([0.5, 0.5])
+
+    covariance = np.array([
+        [0.04, 0.01],
+        [0.01, 0.09],
+    ])
+
+    result = diversification_ratio(
+        weights,
+        covariance,
+    )
+
+    expected = 0.25 / np.sqrt(0.0375)
+
+    assert np.isclose(result, expected)
+
+def test_diversification_ratio_invalid_shape():
+    with pytest.raises(ValueError):
+        diversification_ratio(
+            np.array([0.5, 0.5]),
+            np.array([[0.04, 0.01]]),
+        )
+
+def test_diversification_ratio_zero_volatility():
+    covariance = np.zeros((2, 2))
+
+    with pytest.raises(ValueError):
+        diversification_ratio(
+            np.array([0.5, 0.5]),
+            covariance,
+        )
+

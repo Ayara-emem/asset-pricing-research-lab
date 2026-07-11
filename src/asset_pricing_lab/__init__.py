@@ -72,7 +72,8 @@ from .portfolio import (
     portfolio_variance,
     portfolio_volatility,
     covariance_matrix,
-    correlation_matrix
+    correlation_matrix,
+    diversification_ratio,
 )
 
 __all__ = [
@@ -123,5 +124,6 @@ __all__ = [
     "portfolio_variance",
     "portfolio_volatility",
     "covariance_matrix",
-    "correlation_matrix"
+    "correlation_matrix",
+    "diversification_ratio",
 ]

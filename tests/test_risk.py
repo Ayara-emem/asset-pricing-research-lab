@@ -19,7 +19,7 @@ from asset_pricing_lab.risk import (
     expected_shortfall,
     tracking_error,
     information_ratio,
-
+    appraisal_ratio,
 )
 
 def test_historical_volatility():
@@ -619,3 +619,56 @@ def test_information_ratio_positive_active_returns():
     )
 
     assert ir > 0
+
+
+def test_information_ratio():
+    portfolio = np.array([0.03, 0.02, 0.04, 0.05])
+    benchmark = np.array([0.02, 0.02, 0.03, 0.04])
+
+    # Active returns = [0.01, 0.00, 0.01, 0.01]
+    # Mean = 0.0075
+    # Sample std (ddof=1) = 0.005
+    # IR = 0.0075 / 0.005 = 1.5
+
+    result = information_ratio(
+        portfolio,
+        benchmark,
+    )
+
+    assert np.isclose(result, 1.5)
+
+
+def test_information_ratio_shape_error():
+    with pytest.raises(ValueError):
+        information_ratio(
+            np.array([1.0, 2.0]),
+            np.array([1.0]),
+        )
+
+def test_information_ratio_zero_tracking_error():
+    with pytest.raises(ValueError):
+        information_ratio(
+            np.array([0.02, 0.02]),
+            np.array([0.02, 0.02]),
+        )
+
+def test_appraisal_ratio():
+    residuals = np.array([-0.01, 0.01])
+
+    result = appraisal_ratio(
+        alpha=0.02,
+        residuals=residuals,
+    )
+
+    # Sample std = sqrt(0.0002) ≈ 0.0141421356
+    expected = 0.02 / np.sqrt(0.0002)
+
+    assert np.isclose(result, expected)
+
+def test_appraisal_ratio_zero_residual_std():
+    with pytest.raises(ValueError):
+        appraisal_ratio(
+            alpha=0.01,
+            residuals=np.array([0.0, 0.0]),
+        )
+

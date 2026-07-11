@@ -41,6 +41,7 @@ from .risk import (
     expected_shortfall,
     tracking_error,
     information_ratio,
+    appraisal_ratio
 ) 
 
 from .capm import (
@@ -106,6 +107,7 @@ __all__ = [
     "r_squared_fama_french",
     "rolling_fama_french",
     "factor_attribution",
-    "adjusted_r_squared"
-    
+    "adjusted_r_squared",
+    "information_ratio",
+    "appraisal_ratio",
 ]

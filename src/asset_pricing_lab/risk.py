@@ -466,72 +466,76 @@ def tracking_error(
 from .statistics import mean_return
 
 
+import numpy as np
+
 def information_ratio(
     portfolio_returns,
     benchmark_returns,
-    ddof: int = 1,
-) -> float:
+    ddof=1,
+):
     """
     Compute the Information Ratio.
 
     Parameters
     ----------
     portfolio_returns : array-like
-        Portfolio periodic returns.
-
+        Portfolio returns.
     benchmark_returns : array-like
-        Benchmark periodic returns.
-
+        Benchmark returns.
     ddof : int, default=1
-        Delta degrees of freedom used in Tracking Error.
+        Delta degrees of freedom used when computing
+        the standard deviation of active returns.
 
     Returns
     -------
     float
-        Information Ratio. Returns np.nan if
-        Tracking Error is zero.
+        Information Ratio.
     """
-    portfolio_returns = np.asarray(
-        portfolio_returns,
-        dtype=float,
-    )
+    portfolio = np.asarray(portfolio_returns, dtype=float)
+    benchmark = np.asarray(benchmark_returns, dtype=float)
 
-    benchmark_returns = np.asarray(
-        benchmark_returns,
-        dtype=float,
-    )
-
-    if portfolio_returns.size == 0:
-        raise ValueError(
-            "portfolio_returns must not be empty."
-        )
-
-    if benchmark_returns.size == 0:
-        raise ValueError(
-            "benchmark_returns must not be empty."
-        )
-
-    if portfolio_returns.shape != benchmark_returns.shape:
+    if portfolio.shape != benchmark.shape:
         raise ValueError(
             "portfolio_returns and benchmark_returns must have the same shape."
         )
 
-    active_returns = (
-        portfolio_returns
-        - benchmark_returns
-    )
+    active = portfolio - benchmark
 
-    active_mean = mean_return(
-        active_returns
-    )
+    tracking_error = np.std(active, ddof=ddof)
 
-    te = tracking_error(
-        portfolio_returns,
-        benchmark_returns,
-        ddof=ddof,
-    )
+    if not np.isfinite(tracking_error) or tracking_error <= 0:
+        raise ValueError("Tracking error must be positive.")
+    return np.mean(active) / tracking_error
 
-    if te == 0:
-        return np.nan
 
-    return active_mean / te
+def appraisal_ratio(
+    alpha,
+    residuals,
+    ddof=1,
+):
+    """
+    Compute the Appraisal Ratio.
+
+    Parameters
+    ----------
+    alpha : float
+        Estimated alpha.
+    residuals : array-like
+        Regression residuals.
+    ddof : int, default=1
+        Delta degrees of freedom used when computing
+        the residual standard deviation.
+
+    Returns
+    -------
+    float
+        Appraisal Ratio.
+    """
+    residuals = np.asarray(residuals, dtype=float)
+
+    residual_std = np.std(residuals, ddof=ddof)
+
+    if np.isclose(residual_std, 0.0):
+        raise ValueError("Residual standard deviation is zero.")
+
+    return alpha / residual_std

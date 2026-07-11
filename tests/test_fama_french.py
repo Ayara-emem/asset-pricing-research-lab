@@ -9,8 +9,7 @@ from asset_pricing_lab.fama_french import (
     r_squared_fama_french,
     rolling_fama_french,
     factor_attribution,
-
-
+    factor_exposure_report,
 )
 
 
@@ -429,3 +428,49 @@ def test_factor_attribution_keys():
         "hml",
         "predicted",
     }
+
+
+import numpy as np
+
+def test_factor_exposure_report_keys():
+    asset = np.array([0.02, 0.03, 0.01, 0.04, 0.05])
+    market = np.array([0.01, 0.02, 0.00, 0.03, 0.04])
+    smb = np.array([0.005, -0.002, 0.001, 0.004, -0.001])
+    hml = np.array([-0.003, 0.002, 0.000, -0.001, 0.003])
+
+    report = factor_exposure_report(
+        asset,
+        market,
+        smb,
+        hml,
+    )
+
+    assert set(report.keys()) == {
+        "alpha",
+        "market_beta",
+        "smb_beta",
+        "hml_beta",
+        "r_squared",
+        "predicted_returns",
+        "residuals",
+        "attribution",
+    }
+
+def test_factor_exposure_report_prediction_consistency():
+    asset = np.array([0.02, 0.03, 0.01, 0.04, 0.05])
+    market = np.array([0.01, 0.02, 0.00, 0.03, 0.04])
+    smb = np.array([0.005, -0.002, 0.001, 0.004, -0.001])
+    hml = np.array([-0.003, 0.002, 0.000, -0.001, 0.003])
+
+    report = factor_exposure_report(
+        asset,
+        market,
+        smb,
+        hml,
+    )
+
+    assert np.allclose(
+        report["predicted_returns"],
+        report["attribution"]["predicted"],
+    )
+

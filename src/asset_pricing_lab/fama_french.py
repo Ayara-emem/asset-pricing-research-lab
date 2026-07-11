@@ -318,8 +318,6 @@ def rolling_fama_french(
         "hml_beta": np.asarray(hml_beta),
     }
 
-import numpy as np
-
 def factor_attribution(
     alpha,
     market_beta,
@@ -374,4 +372,76 @@ def factor_attribution(
         "smb": smb_contribution,
         "hml": hml_contribution,
         "predicted": predicted,
+    }
+
+
+def factor_exposure_report(
+    asset_returns,
+    market_excess,
+    smb,
+    hml,
+):
+    """
+    Generate a comprehensive Fama-French factor exposure report.
+
+    Parameters
+    ----------
+    asset_returns : array-like
+    market_excess : array-like
+    smb : array-like
+    hml : array-like
+
+    Returns
+    -------
+    dict
+        Report containing regression estimates,
+        diagnostics, predictions, residuals,
+        and factor attribution.
+    """
+    estimates = estimate_fama_french(
+        asset_returns,
+        market_excess,
+        smb,
+        hml,
+    )
+
+    predicted = predicted_returns_fama_french(
+    market_excess,
+    smb,
+    hml,
+    estimates["alpha"],
+    estimates["market_beta"],
+    estimates["smb_beta"],
+    estimates["hml_beta"],
+)
+
+    residuals = residuals_fama_french(
+        asset_returns,
+        predicted,
+    )
+
+    r2 = r_squared_fama_french(
+        asset_returns,
+        predicted,
+    )
+
+    attribution = factor_attribution(
+        estimates["alpha"],
+        estimates["market_beta"],
+        estimates["smb_beta"],
+        estimates["hml_beta"],
+        market_excess,
+        smb,
+        hml,
+    )
+
+    return {
+        "alpha": estimates["alpha"],
+        "market_beta": estimates["market_beta"],
+        "smb_beta": estimates["smb_beta"],
+        "hml_beta": estimates["hml_beta"],
+        "r_squared": r2,
+        "predicted_returns": predicted,
+        "residuals": residuals,
+        "attribution": attribution,
     }

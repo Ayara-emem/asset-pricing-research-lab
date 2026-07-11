@@ -8,6 +8,7 @@ from asset_pricing_lab.fama_french import (
     residuals_fama_french,
     r_squared_fama_french,
     rolling_fama_french,
+    factor_attribution,
 
 
 )
@@ -380,3 +381,51 @@ def test_rolling_fama_french_shape_error():
             hml,
             window=3,
         )
+
+def test_factor_attribution_values():
+    result = factor_attribution(
+        alpha=0.001,
+        market_beta=1.2,
+        smb_beta=0.5,
+        hml_beta=-0.2,
+        market_excess=np.array([0.02]),
+        smb=np.array([0.01]),
+        hml=np.array([-0.03]),
+    )
+
+    assert np.allclose(result["alpha"], [0.001])
+    assert np.allclose(result["market"], [0.024])
+    assert np.allclose(result["smb"], [0.005])
+    assert np.allclose(result["hml"], [0.006])
+    assert np.allclose(result["predicted"], [0.036])
+
+def test_factor_attribution_shape_error():
+    with pytest.raises(ValueError):
+        factor_attribution(
+            alpha=0.0,
+            market_beta=1.0,
+            smb_beta=1.0,
+            hml_beta=1.0,
+            market_excess=np.array([1.0, 2.0]),
+            smb=np.array([1.0]),
+            hml=np.array([1.0, 2.0]),
+        )
+
+def test_factor_attribution_keys():
+    result = factor_attribution(
+        alpha=0.0,
+        market_beta=1.0,
+        smb_beta=1.0,
+        hml_beta=1.0,
+        market_excess=np.array([1.0]),
+        smb=np.array([2.0]),
+        hml=np.array([3.0]),
+    )
+
+    assert set(result.keys()) == {
+        "alpha",
+        "market",
+        "smb",
+        "hml",
+        "predicted",
+    }

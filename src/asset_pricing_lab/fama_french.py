@@ -317,3 +317,61 @@ def rolling_fama_french(
         "smb_beta": np.asarray(smb_beta),
         "hml_beta": np.asarray(hml_beta),
     }
+
+import numpy as np
+
+def factor_attribution(
+    alpha,
+    market_beta,
+    smb_beta,
+    hml_beta,
+    market_excess,
+    smb,
+    hml,
+):
+    """
+    Compute Fama-French factor attribution.
+
+    Parameters
+    ----------
+    alpha : float
+    market_beta : float
+    smb_beta : float
+    hml_beta : float
+    market_excess : array-like
+    smb : array-like
+    hml : array-like
+
+    Returns
+    -------
+    dict
+        Factor contributions and predicted returns.
+    """
+    market = np.asarray(market_excess, dtype=float)
+    smb = np.asarray(smb, dtype=float)
+    hml = np.asarray(hml, dtype=float)
+
+    if not (market.shape == smb.shape == hml.shape):
+        raise ValueError(
+            "market_excess, smb, and hml must have the same shape."
+        )
+
+    alpha_contribution = np.full_like(market, alpha, dtype=float)
+    market_contribution = market_beta * market
+    smb_contribution = smb_beta * smb
+    hml_contribution = hml_beta * hml
+
+    predicted = (
+        alpha_contribution
+        + market_contribution
+        + smb_contribution
+        + hml_contribution
+    )
+
+    return {
+        "alpha": alpha_contribution,
+        "market": market_contribution,
+        "smb": smb_contribution,
+        "hml": hml_contribution,
+        "predicted": predicted,
+    }

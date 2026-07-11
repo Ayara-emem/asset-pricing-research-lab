@@ -290,3 +290,42 @@ def correlation_matrix(returns):
         returns,
         rowvar=False,
     )
+
+import numpy as np
+
+def adjusted_r_squared(
+    r_squared,
+    n_observations,
+    n_predictors,
+):
+    """
+    Compute the adjusted R-squared statistic.
+
+    Parameters
+    ----------
+    r_squared : float
+        Ordinary R-squared.
+    n_observations : int
+        Number of observations.
+    n_predictors : int
+        Number of predictors (excluding the intercept).
+
+    Returns
+    -------
+    float
+        Adjusted R-squared.
+    """
+    if not 0.0 <= r_squared <= 1.0:
+        raise ValueError("r_squared must be between 0 and 1.")
+
+    if n_observations <= n_predictors + 1:
+        raise ValueError(
+            "n_observations must be greater than n_predictors + 1."
+        )
+
+    return (
+        1.0
+        - (1.0 - r_squared)
+        * (n_observations - 1)
+        / (n_observations - n_predictors - 1)
+    )

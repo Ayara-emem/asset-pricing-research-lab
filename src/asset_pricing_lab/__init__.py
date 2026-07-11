@@ -25,6 +25,7 @@ from .statistics import (
     skewness,
     covariance_matrix,
     correlation_matrix,
+    adjusted_r_squared,
 )
 
 from .risk import (
@@ -61,9 +62,10 @@ from .fama_french import (
     residuals_fama_french,
     r_squared_fama_french,
     rolling_fama_french,
-
+    factor_attribution,
 
 )
+
 __all__ = [
     "arithmetic_returns",
     "log_returns",
@@ -100,7 +102,10 @@ __all__ = [
     "fama_french_expected_return",
     "estimate_fama_french",
     "predicted_returns_fama_french",
-    "residuals_fama_french"
+    "residuals_fama_french",
     "r_squared_fama_french",
-    "rolling_fama_french"
+    "rolling_fama_french",
+    "factor_attribution",
+    "adjusted_r_squared"
+    
 ]

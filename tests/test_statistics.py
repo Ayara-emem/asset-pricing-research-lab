@@ -13,7 +13,8 @@ from asset_pricing_lab.statistics import (
     correlation,
     skewness,
     covariance_matrix,
-    correlation_matrix
+    correlation_matrix,
+    adjusted_r_squared,
 )
 
 def test_mean_return():
@@ -308,3 +309,40 @@ def test_correlation_matrix_empty():
 def test_correlation_matrix_one_dimensional():
     with pytest.raises(ValueError):
         correlation_matrix([1, 2, 3])
+
+from asset_pricing_lab.statistics import adjusted_r_squared
+
+def test_adjusted_r_squared():
+    result = adjusted_r_squared(
+        r_squared=0.85,
+        n_observations=100,
+        n_predictors=3,
+    )
+
+    assert np.isclose(result, 0.8453125)
+
+def test_adjusted_r_squared_perfect():
+    result = adjusted_r_squared(
+        r_squared=1.0,
+        n_observations=50,
+        n_predictors=3,
+    )
+
+    assert result == 1.0
+
+def test_adjusted_r_squared_invalid_r2():
+    with pytest.raises(ValueError):
+        adjusted_r_squared(
+            r_squared=1.2,
+            n_observations=100,
+            n_predictors=3,
+        )
+
+def test_adjusted_r_squared_invalid_sample_size():
+    with pytest.raises(ValueError):
+        adjusted_r_squared(
+            r_squared=0.8,
+            n_observations=4,
+            n_predictors=3,
+        )
+

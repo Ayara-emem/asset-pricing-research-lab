@@ -388,3 +388,104 @@ def global_minimum_variance_portfolio(
         "variance": variance,
         "volatility": volatility,
     }
+
+import numpy as np
+
+
+def maximum_sharpe_portfolio(
+    expected_returns,
+    covariance_matrix,
+    risk_free_rate=0.0,
+):
+    """
+    Compute the Maximum Sharpe (Tangency) Portfolio.
+
+    Parameters
+    ----------
+    expected_returns : array-like
+        Expected returns.
+
+    covariance_matrix : array-like
+        Covariance matrix.
+
+    risk_free_rate : float, default=0.0
+        Risk-free rate.
+
+    Returns
+    -------
+    dict
+        Portfolio statistics.
+    """
+    expected_returns = np.asarray(
+        expected_returns,
+        dtype=float,
+    )
+
+    covariance_matrix = np.asarray(
+        covariance_matrix,
+        dtype=float,
+    )
+
+    if covariance_matrix.ndim != 2:
+        raise ValueError(
+            "covariance_matrix must be two-dimensional."
+        )
+
+    n = len(expected_returns)
+
+    if covariance_matrix.shape != (n, n):
+        raise ValueError(
+            "covariance_matrix shape must match expected_returns."
+        )
+
+    ones = np.ones(n)
+
+    excess_returns = (
+        expected_returns
+        - risk_free_rate
+    )
+
+    try:
+        weights = np.linalg.solve(
+            covariance_matrix,
+            excess_returns,
+        )
+    except np.linalg.LinAlgError as exc:
+        raise ValueError(
+            "covariance_matrix is singular."
+        ) from exc
+
+    weights /= ones @ weights
+
+    expected_return = portfolio_expected_return(
+        weights,
+        expected_returns,
+    )
+
+    variance = portfolio_variance(
+        weights,
+        covariance_matrix,
+    )
+
+    volatility = portfolio_volatility(
+        weights,
+        covariance_matrix,
+    )
+
+    if np.isclose(volatility, 0.0):
+        raise ValueError(
+            "Portfolio volatility is zero."
+        )
+
+    sharpe_ratio = (
+        expected_return
+        - risk_free_rate
+    ) / volatility
+
+    return {
+        "weights": weights,
+        "expected_return": expected_return,
+        "variance": variance,
+        "volatility": volatility,
+        "sharpe_ratio": sharpe_ratio,
+    }

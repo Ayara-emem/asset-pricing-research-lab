@@ -12,8 +12,6 @@ from asset_pricing_lab.portfolio import (
     diversification_ratio,
     simulate_portfolios,
     global_minimum_variance_portfolio,
-
-
 )
 
 
@@ -240,7 +238,6 @@ def test_simulate_portfolios_invalid_count():
 
             n_portfolios=0,
         )
-
 
 def test_gmvp_weights_sum_to_one():
     covariance = np.array([

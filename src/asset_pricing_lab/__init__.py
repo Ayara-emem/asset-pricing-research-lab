@@ -68,6 +68,7 @@ from .fama_french import (
 )
 
 from .portfolio import (
+    maximum_sharpe_portfolio,
     portfolio_expected_return,
     portfolio_variance,
     portfolio_volatility,
@@ -75,8 +76,8 @@ from .portfolio import (
     correlation_matrix,
     diversification_ratio,
     simulate_portfolios,
-    global_minimum_variance_portfolio
-)
+    global_minimum_variance_portfolio,
+    maximum_sharpe_portfolio,)
 
 __all__ = [
     "arithmetic_returns",
@@ -129,5 +130,6 @@ __all__ = [
     "correlation_matrix",
     "diversification_ratio",
     "simulate_portfolios",
-    "global_minimum_variance_portfolio"
+    "global_minimum_variance_portfolio",
+    "maximum_sharpe_portfolio",
 ]

@@ -80,6 +80,9 @@ from .portfolio import (
     maximum_sharpe_portfolio,
     efficient_frontier,
     project_weights,
+    marginal_risk_contribution,
+    risk_contribution,
+    percentage_risk_contribution,
 )
 
 __all__ = [
@@ -137,4 +140,7 @@ __all__ = [
     "maximum_sharpe_portfolio",
     "efficient_frontier",
     "project_weights",
+    "marginal_risk_contribution",
+    "risk_contribution",
+    "percentage_risk_contribution",
 ]

@@ -15,6 +15,9 @@ from asset_pricing_lab.portfolio import (
     global_minimum_variance_portfolio,
     efficient_frontier,
     project_weights,
+    marginal_risk_contribution,
+    risk_contribution,
+    percentage_risk_contribution,
 )
 
 
@@ -466,3 +469,79 @@ def test_project_weights_upper_bound():
         result.sum(),
         1.0,
     )
+
+import pytest
+
+def test_project_weights_invalid_bounds():
+    with pytest.raises(ValueError):
+        project_weights(
+            np.array([0.5, 0.5]),
+            lower_bound=0.6,
+            upper_bound=0.5,
+        )
+
+def test_project_weights_zero_sum():
+    with pytest.raises(ValueError):
+        project_weights(
+            np.array([-1.0, -2.0]),
+            lower_bound=0.0,
+            upper_bound=0.0,
+        )
+
+def test_risk_contributions_sum_to_volatility():
+    weights = np.array([0.5, 0.5])
+
+    covariance = np.array([
+        [0.04, 0.01],
+        [0.01, 0.09],
+    ])
+
+    rc = risk_contribution(
+        weights,
+        covariance,
+    )
+
+    portfolio_vol = portfolio_volatility(
+        weights,
+        covariance,
+    )
+
+    assert np.isclose(
+        rc.sum(),
+        portfolio_vol,
+    )
+
+def test_percentage_risk_contributions_sum_to_one():
+    weights = np.array([0.5, 0.5])
+
+    covariance = np.array([
+        [0.04, 0.01],
+        [0.01, 0.09],
+    ])
+
+    prc = percentage_risk_contribution(
+        weights,
+        covariance,
+    )
+
+    assert np.isclose(
+        prc.sum(),
+        1.0,
+    )
+
+def test_marginal_risk_contribution_invalid_shape():
+    with pytest.raises(ValueError):
+        marginal_risk_contribution(
+            np.array([0.5, 0.5]),
+            np.eye(3),
+        )
+
+def test_marginal_risk_contribution_zero_volatility():
+    covariance = np.zeros((2, 2))
+
+    with pytest.raises(ValueError):
+        marginal_risk_contribution(
+            np.array([0.5, 0.5]),
+            covariance,
+        )
+

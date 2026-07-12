@@ -641,3 +641,79 @@ def project_weights(
     projected /= total
 
     return projected
+
+import numpy as np
+
+def marginal_risk_contribution(
+    weights,
+    covariance_matrix,
+):
+    """
+    Compute marginal risk contributions.
+    """
+    weights = np.asarray(weights, dtype=float)
+    covariance_matrix = np.asarray(covariance_matrix, dtype=float)
+
+    if covariance_matrix.ndim != 2:
+        raise ValueError(
+            "covariance_matrix must be two-dimensional."
+        )
+
+    n = len(weights)
+
+    if covariance_matrix.shape != (n, n):
+        raise ValueError(
+            "covariance_matrix shape must match weights."
+        )
+
+    portfolio_vol = portfolio_volatility(
+        weights,
+        covariance_matrix,
+    )
+
+    if np.isclose(portfolio_vol, 0.0):
+        raise ValueError(
+            "Portfolio volatility is zero."
+        )
+
+    return (
+        covariance_matrix @ weights
+    ) / portfolio_vol
+
+def risk_contribution(
+    weights,
+    covariance_matrix,
+):
+    """
+    Compute total risk contribution of each asset.
+    """
+    weights = np.asarray(weights, dtype=float)
+
+    return (
+        weights
+        * marginal_risk_contribution(
+            weights,
+            covariance_matrix,
+        )
+    )
+
+def percentage_risk_contribution(
+    weights,
+    covariance_matrix,
+):
+    """
+    Compute percentage risk contributions.
+    """
+    rc = risk_contribution(
+        weights,
+        covariance_matrix,
+    )
+
+    total = rc.sum()
+
+    if np.isclose(total, 0.0):
+        raise ValueError(
+            "Total risk contribution is zero."
+        )
+
+    return rc / total

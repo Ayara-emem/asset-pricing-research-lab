@@ -717,3 +717,77 @@ def percentage_risk_contribution(
         )
 
     return rc / total
+
+import numpy as np
+
+
+def risk_parity_portfolio(
+    covariance_matrix,
+):
+    """
+    Construct an approximate Risk Parity portfolio
+    using inverse-volatility weights.
+
+    Parameters
+    ----------
+    covariance_matrix : array-like
+        Covariance matrix.
+
+    Returns
+    -------
+    dict
+        Portfolio statistics.
+    """
+    covariance_matrix = np.asarray(
+        covariance_matrix,
+        dtype=float,
+    )
+
+    if covariance_matrix.ndim != 2:
+        raise ValueError(
+            "covariance_matrix must be two-dimensional."
+        )
+
+    n, m = covariance_matrix.shape
+
+    if n != m:
+        raise ValueError(
+            "covariance_matrix must be square."
+        )
+
+    asset_volatility = np.sqrt(
+        np.diag(covariance_matrix)
+    )
+
+    if np.any(
+        np.isclose(asset_volatility, 0.0)
+    ):
+        raise ValueError(
+            "Asset volatility must be positive."
+        )
+
+    inverse_vol = 1.0 / asset_volatility
+
+    weights = inverse_vol / inverse_vol.sum()
+
+    variance = portfolio_variance(
+        weights,
+        covariance_matrix,
+    )
+
+    volatility = portfolio_volatility(
+        weights,
+        covariance_matrix,
+    )
+
+    rc = risk_contribution(
+        weights,
+        covariance_matrix,
+    )
+
+    return {
+        "weights": weights,
+        "variance": variance,
+        "volatility": volatility,
+        "risk_contributions": rc,
+    }

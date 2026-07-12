@@ -18,6 +18,8 @@ from asset_pricing_lab.portfolio import (
     marginal_risk_contribution,
     risk_contribution,
     percentage_risk_contribution,
+    risk_parity_portfolio,
+
 )
 
 
@@ -544,4 +546,72 @@ def test_marginal_risk_contribution_zero_volatility():
             np.array([0.5, 0.5]),
             covariance,
         )
+
+
+def test_risk_parity_weights_sum_to_one():
+    covariance = np.array([
+        [0.04, 0.01],
+        [0.01, 0.09],
+    ])
+
+    result = risk_parity_portfolio(
+        covariance,
+    )
+
+    assert np.isclose(
+        result["weights"].sum(),
+        1.0,
+    )
+
+def test_risk_parity_output_keys():
+    covariance = np.array([
+        [0.04, 0.01],
+        [0.01, 0.09],
+    ])
+
+    result = risk_parity_portfolio(
+        covariance,
+    )
+
+    assert set(result.keys()) == {
+        "weights",
+        "variance",
+        "volatility",
+        "risk_contributions",
+    }
+
+def test_risk_parity_non_square():
+    with pytest.raises(ValueError):
+        risk_parity_portfolio(
+            np.ones((2, 3)),
+        )
+
+def test_risk_parity_zero_volatility():
+    covariance = np.array([
+        [0.0, 0.0],
+        [0.0, 0.09],
+    ])
+
+    with pytest.raises(ValueError):
+        risk_parity_portfolio(
+            covariance,
+        )
+
+def test_risk_parity_balanced_risk():
+    covariance = np.array([
+        [0.04, 0.00],
+        [0.00, 0.09],
+    ])
+
+    result = risk_parity_portfolio(
+        covariance,
+    )
+
+    rc = result["risk_contributions"]
+
+    assert np.isclose(
+        rc[0],
+        rc[1],
+        atol=1e-6,
+    )
 

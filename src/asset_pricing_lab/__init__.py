@@ -83,6 +83,7 @@ from .portfolio import (
     marginal_risk_contribution,
     risk_contribution,
     percentage_risk_contribution,
+    risk_parity_portfolio,
 )
 
 __all__ = [
@@ -143,4 +144,5 @@ __all__ = [
     "marginal_risk_contribution",
     "risk_contribution",
     "percentage_risk_contribution",
+    "risk_parity_portfolio",
 ]

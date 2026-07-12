@@ -489,3 +489,90 @@ def maximum_sharpe_portfolio(
         "volatility": volatility,
         "sharpe_ratio": sharpe_ratio,
     }
+
+def efficient_frontier(
+    expected_returns,
+    covariance_matrix,
+    n_portfolios=10000,
+    n_bins=100,
+    random_state=None,
+):
+    """
+    Approximate the Efficient Frontier using
+    Monte Carlo simulation.
+
+    Parameters
+    ----------
+    expected_returns : array-like
+    covariance_matrix : array-like
+    n_portfolios : int
+    n_bins : int
+    random_state : int or None
+
+    Returns
+    -------
+    dict
+        Approximate Efficient Frontier.
+    """
+    if n_bins <= 0:
+        raise ValueError(
+            "n_bins must be positive."
+        )
+
+    simulation = simulate_portfolios(
+        expected_returns,
+        covariance_matrix,
+        n_portfolios=n_portfolios,
+        random_state=random_state,
+    )
+
+    vol = simulation["volatility"]
+    ret = simulation["returns"]
+    weights = simulation["weights"]
+
+    edges = np.linspace(
+        vol.min(),
+        vol.max(),
+        n_bins + 1,
+    )
+
+    frontier_weights = []
+    frontier_returns = []
+    frontier_volatility = []
+
+    for i in range(n_bins):
+        if i == n_bins - 1:
+            mask = (
+                (vol >= edges[i]) &
+                (vol <= edges[i + 1])
+            )
+        else:
+            mask = (
+                (vol >= edges[i]) &
+                (vol < edges[i + 1])
+            )
+
+        if not np.any(mask):
+            continue
+
+        local_returns = ret[mask]
+
+        best = np.argmax(local_returns)
+
+        frontier_weights.append(
+            weights[mask][best]
+        )
+
+        frontier_returns.append(
+            local_returns[best]
+        )
+
+        frontier_volatility.append(
+            vol[mask][best]
+        )
+
+    return {
+        "weights": np.asarray(frontier_weights),
+        "returns": np.asarray(frontier_returns),
+        "volatility": np.asarray(frontier_volatility),
+    }

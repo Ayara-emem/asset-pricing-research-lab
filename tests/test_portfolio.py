@@ -13,6 +13,7 @@ from asset_pricing_lab.portfolio import (
     diversification_ratio,
     simulate_portfolios,
     global_minimum_variance_portfolio,
+    efficient_frontier,
 )
 
 
@@ -349,3 +350,70 @@ def test_maximum_sharpe_invalid_shape():
             np.array([0.08, 0.10]),
             np.eye(3),
         )
+
+def test_efficient_frontier_shapes():
+    result = efficient_frontier(
+        expected_returns=np.array([0.08, 0.10]),
+        covariance_matrix=np.eye(2),
+        n_portfolios=500,
+        n_bins=20,
+        random_state=42,
+    )
+
+    assert result["weights"].ndim == 2
+    assert result["returns"].ndim == 1
+    assert result["volatility"].ndim == 1
+
+    assert (
+        len(result["weights"])
+        ==
+        len(result["returns"])
+        ==
+        len(result["volatility"])
+    )
+
+def test_frontier_weights_sum_to_one():
+    result = efficient_frontier(
+        np.array([0.08, 0.10]),
+        np.eye(2),
+        n_portfolios=500,
+        n_bins=20,
+        random_state=42,
+    )
+
+    assert np.allclose(
+        result["weights"].sum(axis=1),
+        1.0,
+    )
+
+def test_efficient_frontier_invalid_bins():
+    with pytest.raises(ValueError):
+        efficient_frontier(
+            np.array([0.08]),
+            np.eye(1),
+            n_bins=0,
+        )
+
+def test_efficient_frontier_reproducible():
+    result1 = efficient_frontier(
+        np.array([0.08, 0.10]),
+        np.eye(2),
+        random_state=123,
+    )
+
+    result2 = efficient_frontier(
+        np.array([0.08, 0.10]),
+        np.eye(2),
+        random_state=123,
+    )
+
+    assert np.allclose(
+        result1["returns"],
+        result2["returns"],
+    )
+
+    assert np.allclose(
+        result1["volatility"],
+        result2["volatility"],
+    )
+    

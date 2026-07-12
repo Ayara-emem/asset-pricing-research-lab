@@ -77,7 +77,9 @@ from .portfolio import (
     diversification_ratio,
     simulate_portfolios,
     global_minimum_variance_portfolio,
-    maximum_sharpe_portfolio,)
+    maximum_sharpe_portfolio,
+    efficient_frontier,
+)
 
 __all__ = [
     "arithmetic_returns",
@@ -132,4 +134,5 @@ __all__ = [
     "simulate_portfolios",
     "global_minimum_variance_portfolio",
     "maximum_sharpe_portfolio",
+    "efficient_frontier",
 ]

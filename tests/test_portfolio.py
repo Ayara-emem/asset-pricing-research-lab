@@ -5,6 +5,7 @@ import pytest
 
 from asset_pricing_lab.portfolio import (
     correlation_matrix,
+    maximum_sharpe_portfolio,
     portfolio_expected_return,
     portfolio_variance,
     portfolio_volatility,
@@ -291,3 +292,60 @@ def test_gmvp_non_square():
             covariance,
         )
 
+def test_maximum_sharpe_weights_sum_to_one():
+    expected_returns = np.array([0.08, 0.12])
+
+    covariance = np.array([
+        [0.04, 0.01],
+        [0.01, 0.09],
+    ])
+
+    result = maximum_sharpe_portfolio(
+        expected_returns,
+        covariance,
+    )
+
+    assert np.isclose(
+        result["weights"].sum(),
+        1.0,
+    )
+
+def test_maximum_sharpe_output_keys():
+    expected_returns = np.array([0.08, 0.12])
+
+    covariance = np.array([
+        [0.04, 0.01],
+        [0.01, 0.09],
+    ])
+
+    result = maximum_sharpe_portfolio(
+        expected_returns,
+        covariance,
+    )
+
+    assert set(result.keys()) == {
+        "weights",
+        "expected_return",
+        "variance",
+        "volatility",
+        "sharpe_ratio",
+    }
+
+def test_maximum_sharpe_singular_matrix():
+    covariance = np.array([
+        [1.0, 2.0],
+        [2.0, 4.0],
+    ])
+
+    with pytest.raises(ValueError):
+        maximum_sharpe_portfolio(
+            np.array([0.08, 0.10]),
+            covariance,
+        )
+
+def test_maximum_sharpe_invalid_shape():
+    with pytest.raises(ValueError):
+        maximum_sharpe_portfolio(
+            np.array([0.08, 0.10]),
+            np.eye(3),
+        )

@@ -79,6 +79,7 @@ from .portfolio import (
     global_minimum_variance_portfolio,
     maximum_sharpe_portfolio,
     efficient_frontier,
+    project_weights,
 )
 
 __all__ = [
@@ -135,4 +136,5 @@ __all__ = [
     "global_minimum_variance_portfolio",
     "maximum_sharpe_portfolio",
     "efficient_frontier",
+    "project_weights",
 ]

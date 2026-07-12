@@ -576,3 +576,68 @@ def efficient_frontier(
         "returns": np.asarray(frontier_returns),
         "volatility": np.asarray(frontier_volatility),
     }
+
+import numpy as np
+
+
+def project_weights(
+    weights,
+    lower_bound=0.0,
+    upper_bound=None,
+):
+    """
+    Project portfolio weights onto simple bounds
+    and renormalize to sum to one.
+
+    Parameters
+    ----------
+    weights : array-like
+        Portfolio weights.
+
+    lower_bound : float, default=0.0
+        Minimum allowed weight.
+
+    upper_bound : float or None, default=None
+        Maximum allowed weight.
+
+    Returns
+    -------
+    numpy.ndarray
+        Projected weights.
+    """
+    weights = np.asarray(weights, dtype=float)
+
+    if weights.ndim != 1:
+        raise ValueError(
+            "weights must be one-dimensional."
+        )
+
+    projected = weights.copy()
+
+    if upper_bound is None:
+        projected = np.maximum(
+            projected,
+            lower_bound,
+        )
+    else:
+        if upper_bound < lower_bound:
+            raise ValueError(
+                "upper_bound must be >= lower_bound."
+            )
+
+        projected = np.clip(
+            projected,
+            lower_bound,
+            upper_bound,
+        )
+
+    total = projected.sum()
+
+    if np.isclose(total, 0.0):
+        raise ValueError(
+            "Projected weights sum to zero."
+        )
+
+    projected /= total
+
+    return projected

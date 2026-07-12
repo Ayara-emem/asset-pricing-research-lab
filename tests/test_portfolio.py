@@ -14,6 +14,7 @@ from asset_pricing_lab.portfolio import (
     simulate_portfolios,
     global_minimum_variance_portfolio,
     efficient_frontier,
+    project_weights,
 )
 
 
@@ -416,4 +417,52 @@ def test_efficient_frontier_reproducible():
         result1["volatility"],
         result2["volatility"],
     )
-    
+
+def test_project_weights_long_only():
+    weights = np.array([
+        -0.2,
+        0.5,
+        0.7,
+    ])
+
+    result = project_weights(weights)
+
+    assert np.all(result >= 0)
+
+    assert np.isclose(
+        result.sum(),
+        1.0,
+    )
+
+def test_project_weights_already_feasible():
+    weights = np.array([
+        0.2,
+        0.5,
+        0.3,
+    ])
+
+    result = project_weights(weights)
+
+    assert np.allclose(
+        result,
+        weights,
+    )
+
+def test_project_weights_upper_bound():
+    weights = np.array([
+        0.8,
+        0.1,
+        0.1,
+    ])
+
+    result = project_weights(
+        weights,
+        upper_bound=0.6,
+    )
+
+    assert np.all(result >= 0)
+
+    assert np.isclose(
+        result.sum(),
+        1.0,
+    )

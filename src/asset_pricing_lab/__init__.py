@@ -86,6 +86,10 @@ from .portfolio import (
     risk_parity_portfolio,
 )
 
+from .black_litterman import (
+    implied_equilibrium_returns,
+)
+
 __all__ = [
     "arithmetic_returns",
     "log_returns",
@@ -145,4 +149,5 @@ __all__ = [
     "risk_contribution",
     "percentage_risk_contribution",
     "risk_parity_portfolio",
+    "implied_equilibrium_returns",
 ]

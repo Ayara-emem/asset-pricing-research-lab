@@ -88,6 +88,9 @@ from .portfolio import (
 
 from .black_litterman import (
     implied_equilibrium_returns,
+    validate_pick_matrix,
+    validate_views,
+    build_pick_matrix,
 )
 
 __all__ = [
@@ -150,4 +153,7 @@ __all__ = [
     "percentage_risk_contribution",
     "risk_parity_portfolio",
     "implied_equilibrium_returns",
+    "validate_pick_matrix"
+    "validate_views"
+    "build_pick_matrix"
 ]

@@ -4,6 +4,9 @@ import pytest
 
 from asset_pricing_lab.black_litterman import (
     implied_equilibrium_returns,
+    validate_pick_matrix,
+    validate_views,
+    build_pick_matrix,
 )
 
 def test_implied_equilibrium_returns():
@@ -59,3 +62,62 @@ def test_implied_equilibrium_returns_weight_dimension():
             np.eye(1),
             3.0,
         )
+
+
+def test_validate_pick_matrix():
+    P = np.array([
+        [1, -1, 0],
+        [0, 1, -1],
+    ])
+
+    result = validate_pick_matrix(
+        P,
+        n_assets=3,
+    )
+
+    assert np.allclose(result, P)
+
+def test_validate_pick_matrix_invalid_columns():
+    with pytest.raises(ValueError):
+        validate_pick_matrix(
+            np.ones((2,4)),
+            n_assets=3,
+        )
+
+def test_validate_views():
+    views = np.array([
+        0.02,
+        0.01,
+    ])
+
+    result = validate_views(
+        views,
+        n_views=2,
+    )
+
+    assert np.allclose(
+        result,
+        views,
+    )
+
+def test_validate_views_length():
+    with pytest.raises(ValueError):
+        validate_views(
+            np.array([0.02]),
+            n_views=2,
+        )
+
+
+def test_build_pick_matrix():
+    P = build_pick_matrix(
+        [
+            [1,-1,0],
+            [0,1,-1],
+        ]
+    )
+
+    assert P.shape == (
+        2,
+        3,
+    )
+

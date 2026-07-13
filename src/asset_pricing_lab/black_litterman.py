@@ -62,3 +62,93 @@ def implied_equilibrium_returns(
         * covariance_matrix
         @ market_weights
     )
+
+import numpy as np
+
+
+def validate_pick_matrix(
+    pick_matrix,
+    n_assets,
+):
+    """
+    Validate a Black-Litterman pick matrix.
+
+    Parameters
+    ----------
+    pick_matrix : array-like
+        Pick matrix.
+
+    n_assets : int
+        Number of assets.
+
+    Returns
+    -------
+    numpy.ndarray
+        Validated pick matrix.
+    """
+    pick_matrix = np.asarray(
+        pick_matrix,
+        dtype=float,
+    )
+
+    if pick_matrix.ndim != 2:
+        raise ValueError(
+            "pick_matrix must be two-dimensional."
+        )
+
+    if pick_matrix.shape[1] != n_assets:
+        raise ValueError(
+            "pick_matrix has incorrect number of columns."
+        )
+
+    return pick_matrix
+
+def validate_views(
+    views,
+    n_views,
+):
+    """
+    Validate the view vector.
+    """
+    views = np.asarray(
+        views,
+        dtype=float,
+    )
+
+    if views.ndim != 1:
+        raise ValueError(
+            "views must be one-dimensional."
+        )
+
+    if len(views) != n_views:
+        raise ValueError(
+            "Number of views does not match pick matrix."
+        )
+
+    return views
+
+def build_pick_matrix(
+    rows,
+):
+    """
+    Build a pick matrix from rows.
+
+    Parameters
+    ----------
+    rows : sequence of array-like
+
+    Returns
+    -------
+    numpy.ndarray
+    """
+    pick_matrix = np.asarray(
+        rows,
+        dtype=float,
+    )
+
+    if pick_matrix.ndim != 2:
+        raise ValueError(
+            "rows must define a two-dimensional matrix."
+        )
+
+    return pick_matrix

@@ -349,3 +349,106 @@ def posterior_expected_returns(
 )
 
     return pi + adjustment
+
+
+from asset_pricing_lab.portfolio import (
+    maximum_sharpe_portfolio,
+)
+
+
+def black_litterman_portfolio(
+    market_weights,
+    covariance_matrix,
+    risk_aversion,
+    pick_matrix,
+    views,
+    omega,
+    tau=0.025,
+    risk_free_rate=0.0,
+):
+    """
+    Construct a Black-Litterman portfolio.
+
+    Parameters
+    ----------
+    market_weights : array-like
+    covariance_matrix : array-like
+    risk_aversion : float
+    pick_matrix : array-like
+    views : array-like
+    omega : array-like
+    tau : float
+    risk_free_rate : float
+
+    Returns
+    -------
+    dict
+    """
+
+    equilibrium = (
+        implied_equilibrium_returns(
+            market_weights,
+            covariance_matrix,
+            risk_aversion,
+        )
+    )
+
+    posterior = (
+        posterior_expected_returns(
+            equilibrium,
+            covariance_matrix,
+            pick_matrix,
+            views,
+            omega,
+            tau=tau,
+        )
+    )
+
+    portfolio = (
+        maximum_sharpe_portfolio(
+            posterior,
+            covariance_matrix,
+            risk_free_rate=risk_free_rate,
+        )
+    )
+
+    return {
+        "equilibrium_returns": equilibrium,
+        "posterior_returns": posterior,
+        **portfolio,
+    }
+
+def black_litterman_report(
+    result,
+):
+    """
+    Build a Black-Litterman summary report.
+
+    Parameters
+    ----------
+    result : dict
+
+    Returns
+    -------
+    dict
+    """
+
+    return {
+        "Expected Return":
+            result["expected_return"],
+
+        "Volatility":
+            result["volatility"],
+
+        "Sharpe Ratio":
+            result["sharpe_ratio"],
+
+        "Weights":
+            result["weights"],
+
+        "Equilibrium Returns":
+            result["equilibrium_returns"],
+
+        "Posterior Returns":
+            result["posterior_returns"],
+    }

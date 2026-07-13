@@ -10,6 +10,8 @@ from asset_pricing_lab.black_litterman import (
     validate_omega,
     default_omega,
     posterior_expected_returns,
+    black_litterman_portfolio,
+    black_litterman_report,
 )
 
 def test_implied_equilibrium_returns():
@@ -323,4 +325,94 @@ def test_posterior_covariance_shape():
 
             np.eye(1),
         )
+
+def test_black_litterman_portfolio_keys():
+
+    covariance = np.eye(2)
+
+    result = black_litterman_portfolio(
+
+        market_weights=np.array([0.5,0.5]),
+
+        covariance_matrix=covariance,
+
+        risk_aversion=3,
+
+        pick_matrix=np.array([[1,-1]]),
+
+        views=np.array([0.02]),
+
+        omega=0.05*np.eye(1),
+    )
+
+    assert set(result.keys()) == {
+
+        "equilibrium_returns",
+
+        "posterior_returns",
+
+        "weights",
+
+        "expected_return",
+
+        "variance",
+
+        "volatility",
+
+        "sharpe_ratio",
+    }
+
+def test_black_litterman_weights_sum():
+
+    covariance = np.eye(2)
+
+    result = black_litterman_portfolio(
+
+        np.array([0.5,0.5]),
+
+        covariance,
+
+        3,
+
+        np.array([[1,-1]]),
+
+        np.array([0.02]),
+
+        0.05*np.eye(1),
+    )
+
+    assert np.isclose(
+
+        result["weights"].sum(),
+
+        1,
+    )
+
+def test_black_litterman_report():
+
+    covariance = np.eye(2)
+
+    result = black_litterman_portfolio(
+
+        np.array([0.5,0.5]),
+
+        covariance,
+
+        3,
+
+        np.array([[1,-1]]),
+
+        np.array([0.02]),
+
+        0.05*np.eye(1),
+    )
+
+    report = black_litterman_report(
+        result
+    )
+
+    assert "Sharpe Ratio" in report
+
+    assert "Weights" in report
+
 

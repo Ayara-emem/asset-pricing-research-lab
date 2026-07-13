@@ -93,6 +93,7 @@ from .black_litterman import (
     build_pick_matrix,
     validate_omega,
     default_omega,
+    posterior_expected_returns,
 )
 
 __all__ = [
@@ -160,4 +161,5 @@ __all__ = [
     "build_pick_matrix",
     "validate_omega",
     "default_omega",
+    "posterior_expected_returns"
 ]

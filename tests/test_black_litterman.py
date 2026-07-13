@@ -9,6 +9,7 @@ from asset_pricing_lab.black_litterman import (
     build_pick_matrix,
     validate_omega,
     default_omega,
+    posterior_expected_returns,
 )
 
 def test_implied_equilibrium_returns():
@@ -214,5 +215,112 @@ def test_validate_omega_negative_diagonal():
         validate_omega(
             omega,
             2,
+        )
+
+def test_posterior_expected_returns_shape():
+
+    pi = np.array([
+        0.08,
+        0.09,
+    ])
+
+    sigma = np.eye(2)
+
+    P = np.array([
+        [1,-1],
+    ])
+
+    Q = np.array([
+        0.02,
+    ])
+
+    omega = (
+        0.05
+        * np.eye(1)
+    )
+
+    result = posterior_expected_returns(
+        pi,
+        sigma,
+        P,
+        Q,
+        omega,
+    )
+
+    assert result.shape == (
+        2,
+    )
+
+def test_posterior_equals_prior_when_views_match():
+
+    pi = np.array([
+        0.08,
+        0.09,
+    ])
+
+    sigma = np.eye(2)
+
+    P = np.array([
+        [1,-1],
+    ])
+
+    Q = P @ pi
+
+    omega = (
+        0.05
+        * np.eye(1)
+    )
+
+    result = posterior_expected_returns(
+        pi,
+        sigma,
+        P,
+        Q,
+        omega,
+    )
+
+    assert np.allclose(
+        result,
+        pi,
+    )
+
+def test_posterior_invalid_tau():
+
+    with pytest.raises(
+        ValueError
+    ):
+
+        posterior_expected_returns(
+
+            np.array([0.08]),
+
+            np.eye(1),
+
+            np.array([[1]]),
+
+            np.array([0.08]),
+
+            np.eye(1),
+
+            tau=0,
+        )
+
+def test_posterior_covariance_shape():
+
+    with pytest.raises(
+        ValueError
+    ):
+
+        posterior_expected_returns(
+
+            np.array([0.08,0.09]),
+
+            np.eye(3),
+
+            np.array([[1,-1]]),
+
+            np.array([0.02]),
+
+            np.eye(1),
         )
 

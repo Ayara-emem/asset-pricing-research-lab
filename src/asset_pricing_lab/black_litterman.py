@@ -248,3 +248,104 @@ def default_omega(
         )
     )
 
+import numpy as np
+
+
+def posterior_expected_returns(
+    equilibrium_returns,
+    covariance_matrix,
+    pick_matrix,
+    views,
+    omega,
+    tau=0.025,
+):
+    """
+    Compute Black-Litterman posterior expected returns.
+
+    Parameters
+    ----------
+    equilibrium_returns : array-like
+    covariance_matrix : array-like
+    pick_matrix : array-like
+    views : array-like
+    omega : array-like
+    tau : float
+
+    Returns
+    -------
+    numpy.ndarray
+    """
+    pi = np.asarray(
+        equilibrium_returns,
+        dtype=float,
+    )
+
+    sigma = np.asarray(
+        covariance_matrix,
+        dtype=float,
+    )
+
+    P = np.asarray(
+        pick_matrix,
+        dtype=float,
+    )
+
+    Q = np.asarray(
+        views,
+        dtype=float,
+    )
+
+    omega = np.asarray(
+        omega,
+        dtype=float,
+    )
+
+    n_assets = len(pi)
+
+    validate_pick_matrix(
+        P,
+        n_assets,
+    )
+
+    validate_views(
+        Q,
+        P.shape[0],
+    )
+
+    validate_omega(
+        omega,
+        P.shape[0],
+    )
+
+    if sigma.shape != (
+        n_assets,
+        n_assets,
+    ):
+        raise ValueError(
+            "covariance_matrix has incorrect shape."
+        )
+
+    if tau <= 0:
+        raise ValueError(
+            "tau must be positive."
+        )
+
+    A = (
+    P @ (tau * sigma) @ P.T
+    + omega
+    )
+    rhs = (
+        Q
+        - P @ pi
+        )
+    adjustment = (
+    tau
+    * sigma
+    @ P.T
+    @ np.linalg.solve(
+        A,
+        rhs,
+    )
+)
+
+    return pi + adjustment

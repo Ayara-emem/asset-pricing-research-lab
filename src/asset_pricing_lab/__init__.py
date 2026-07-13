@@ -91,6 +91,8 @@ from .black_litterman import (
     validate_pick_matrix,
     validate_views,
     build_pick_matrix,
+    validate_omega,
+    default_omega,
 )
 
 __all__ = [
@@ -153,7 +155,9 @@ __all__ = [
     "percentage_risk_contribution",
     "risk_parity_portfolio",
     "implied_equilibrium_returns",
-    "validate_pick_matrix"
-    "validate_views"
-    "build_pick_matrix"
+    "validate_pick_matrix",
+    "validate_views",
+    "build_pick_matrix",
+    "validate_omega",
+    "default_omega",
 ]

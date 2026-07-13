@@ -7,6 +7,8 @@ from asset_pricing_lab.black_litterman import (
     validate_pick_matrix,
     validate_views,
     build_pick_matrix,
+    validate_omega,
+    default_omega,
 )
 
 def test_implied_equilibrium_returns():
@@ -120,4 +122,97 @@ def test_build_pick_matrix():
         2,
         3,
     )
+
+def test_default_omega():
+
+    omega = default_omega(
+        3
+    )
+
+    assert omega.shape == (
+        3,
+        3,
+    )
+
+    assert np.allclose(
+        omega,
+        omega.T,
+    )
+
+def test_default_omega_diagonal():
+
+    omega = default_omega(
+        4,
+        uncertainty=0.10,
+    )
+
+    expected = (
+        0.10
+        * np.eye(4)
+    )
+
+    assert np.allclose(
+        omega,
+        expected,
+    )
+
+def test_validate_omega():
+
+    omega = (
+        0.05
+        * np.eye(2)
+    )
+
+    result = validate_omega(
+        omega,
+        2,
+    )
+
+    assert np.allclose(
+        result,
+        omega,
+    )
+
+def test_validate_omega_shape():
+
+    with pytest.raises(
+        ValueError
+    ):
+
+        validate_omega(
+            np.eye(3),
+            2,
+        )
+
+def test_validate_omega_not_symmetric():
+
+    omega = np.array([
+        [1,2],
+        [0,1],
+    ])
+
+    with pytest.raises(
+        ValueError
+    ):
+
+        validate_omega(
+            omega,
+            2,
+        )
+
+def test_validate_omega_negative_diagonal():
+
+    omega = np.array([
+        [-1,0],
+        [0,1],
+    ])
+
+    with pytest.raises(
+        ValueError
+    ):
+
+        validate_omega(
+            omega,
+            2,
+        )
 

@@ -152,3 +152,99 @@ def build_pick_matrix(
         )
 
     return pick_matrix
+
+import numpy as np
+
+
+def validate_omega(
+    omega,
+    n_views,
+):
+    """
+    Validate the Black-Litterman Omega matrix.
+
+    Parameters
+    ----------
+    omega : array-like
+
+    n_views : int
+
+    Returns
+    -------
+    numpy.ndarray
+    """
+    omega = np.asarray(
+        omega,
+        dtype=float,
+    )
+
+    if omega.ndim != 2:
+        raise ValueError(
+            "omega must be two-dimensional."
+        )
+
+    if omega.shape != (
+        n_views,
+        n_views,
+    ):
+        raise ValueError(
+            "omega has incorrect shape."
+        )
+
+    if not np.allclose(
+        omega,
+        omega.T,
+    ):
+        raise ValueError(
+            "omega must be symmetric."
+        )
+
+    diagonal = np.diag(
+        omega
+    )
+
+    if np.any(
+        diagonal <= 0
+    ):
+        raise ValueError(
+            "omega must have positive diagonal."
+        )
+
+    return omega
+
+def default_omega(
+    n_views,
+    uncertainty=0.05,
+):
+    """
+    Construct a default diagonal
+    Omega matrix.
+
+    Parameters
+    ----------
+    n_views : int
+
+    uncertainty : float
+
+    Returns
+    -------
+    numpy.ndarray
+    """
+    if n_views <= 0:
+        raise ValueError(
+            "n_views must be positive."
+        )
+
+    if uncertainty <= 0:
+        raise ValueError(
+            "uncertainty must be positive."
+        )
+
+    return (
+        uncertainty
+        * np.eye(
+            n_views,
+            dtype=float,
+        )
+    )
+
